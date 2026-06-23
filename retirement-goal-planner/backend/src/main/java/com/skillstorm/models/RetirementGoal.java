@@ -2,10 +2,8 @@ package com.skillstorm.models;
 
 import lombok.*;
 import jakarta.persistence.*;
-import java.time.LocalDate;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +12,6 @@ import java.util.List;
  */
 @Entity
 @Table(name = "retirement_goals")
-// indexes = {
-//         @Index(name = "idx_goals_user_id", columnList = "user_id")
-//     }
 @Getter
 @Setter
 @NoArgsConstructor
@@ -46,7 +41,7 @@ public class RetirementGoal {
 
 
     /**
-     * Human-readable name for this goal (e.g., "Early Retirement", "Coastal Condo Fund").
+     * Human-readable name for this goal
      */
     @Column(name = "name", nullable = false)
     private String name;
@@ -65,13 +60,6 @@ public class RetirementGoal {
     private BigDecimal targetAmount;
 
     /**
-     * Free-text notes the user can attach to provide context for this goal.
-     * Stored as an unbounded {@code TEXT} column; may be {@code null}.
-    //  */
-    // @Column(name = "notes", columnDefinition = "TEXT")
-    // private String notes;
-
-    /**
      * All contributions that have been logged toward this goal.
      */
     @OneToMany(
@@ -82,33 +70,4 @@ public class RetirementGoal {
     @Builder.Default
     private List<Contribution> contributions = new ArrayList<>();
 
-
-    /**
-     * Timestamp set once when the row is first inserted.
-     */
-    // @Column(name = "created_at", nullable = false, updatable = false)
-    // private LocalDateTime createdAt;
-
-    // /**
-    //  * Timestamp refreshed on every update via {@link #onUpdate()}.
-    //  */
-    // @Column(name = "updated_at", nullable = false)
-    // private LocalDateTime updatedAt;
-
-    // /**
-    //  * Initializes audit timestamps at insert time.
-    //  */
-    // @PrePersist
-    // protected void onCreate() {
-    //     createdAt = LocalDateTime.now();
-    //     updatedAt = LocalDateTime.now();
-    // }
-
-    /**
-    //  * Refreshes {@code updatedAt} whenever this entity is modified and saved.
-    //  */
-    // @PreUpdate
-    // protected void onUpdate() {
-    //     updatedAt = LocalDateTime.now();
-    // }
 }

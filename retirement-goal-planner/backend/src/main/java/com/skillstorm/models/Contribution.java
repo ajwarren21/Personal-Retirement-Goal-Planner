@@ -7,7 +7,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * Persistent junction entity that models a single contribution event.
@@ -78,7 +77,7 @@ public class Contribution {
     private LocalDate contributionDate;
 
     /**
-     * IRS contribution category, stored as its enum name string for readability.
+     * Contribution category, stored as its enum name string for readability.
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)

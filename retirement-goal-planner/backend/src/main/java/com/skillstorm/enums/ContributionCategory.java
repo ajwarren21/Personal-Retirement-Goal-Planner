@@ -9,5 +9,5 @@ public enum ContributionCategory {
     EMPLOYER_MATCH,
     CATCH_UP_CONTRIBUTION,
     ROLLOVER
-    
+
 }
