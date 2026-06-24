@@ -5,10 +5,17 @@ import com.skillstorm.enums.SourceType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.*;
 
 
 @Entity
 @Table(name = "funding_sources")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class FundingSource {
     
     @Id
