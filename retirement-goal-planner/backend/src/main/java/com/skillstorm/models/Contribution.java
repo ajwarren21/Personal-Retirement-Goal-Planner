@@ -83,5 +83,11 @@ public class Contribution {
     @Column(name = "category", nullable = false)
     private ContributionCategory category;
 
+    /**
+     * Contribution notes.
+     */
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
 
 }

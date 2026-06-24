@@ -1,10 +1,13 @@
 package com.skillstorm.services;
 
+// import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.skillstorm.dtos.ResponseRetirementGoalDto;
 import com.skillstorm.dtos.RetirementGoalDto;
 import com.skillstorm.mappers.RetirementGoalMapper;
+import com.skillstorm.models.RetirementGoal;
 import com.skillstorm.repositories.RetirementGoalRepository;
 
 @Service
@@ -19,24 +22,30 @@ public class RetirementGoalService {
     }
 
     public Iterable<ResponseRetirementGoalDto> getAll() {
-
+        return repo.findAll().stream().map(mapper::toDto).toList();
     }
 
     public ResponseRetirementGoalDto getById(long id) {
-
+        RetirementGoal r = repo.findById(id).orElseThrow();
+        return mapper.toDto(r);
     }
 
     public ResponseRetirementGoalDto create(RetirementGoalDto dto) {
-
+        return mapper.toDto(repo.save(mapper.toEntity(dto)));
     }
 
     public ResponseRetirementGoalDto update(RetirementGoalDto dto) {
+        RetirementGoal r = repo.findById(dto.id()).orElseThrow();
+        mapper.updateEntityFromDto(dto, r);
 
+        repo.save(r);
+        return mapper.toDto(r);
     }
 
     public void delete(long id) {
-
+        RetirementGoal r = repo.findById(id).orElseThrow();
+        repo.delete(r);
     }
 
-    
+
 }

@@ -70,4 +70,10 @@ public class RetirementGoal {
     @Builder.Default
     private List<Contribution> contributions = new ArrayList<>();
 
+    /**
+     * RetirementGoal Notes.
+     */
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
 }
