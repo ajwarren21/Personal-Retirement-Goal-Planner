@@ -6,6 +6,7 @@ import com.skillstorm.dtos.ResponseUserDto;
 import com.skillstorm.dtos.UserDto;
 import com.skillstorm.exceptions.UserNotFoundException;
 import com.skillstorm.mappers.UserMapper;
+import com.skillstorm.models.User;
 import com.skillstorm.repositories.UserRepository;
 
 @Service
@@ -32,13 +33,14 @@ public class UserService {
     }
 
     public ResponseUserDto update(long id, UserDto dto) {
-        var entity = repo.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        User entity = repo.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         mapper.updateEntityFromDto(dto, entity);
         return mapper.toResponseDto(repo.save(entity));
     }
 
     public void delete(long id) {
-        repo.deleteById(id);
+        User entity = repo.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        repo.delete(entity);
     }
 
 }

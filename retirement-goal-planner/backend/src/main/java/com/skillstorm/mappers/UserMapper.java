@@ -22,12 +22,10 @@ public interface UserMapper {
     User toEntity(UserDto dto);
 
     /**
-     * Maps a User entity to a ResponseUserDto. The password and fundingSources fields are ignored during the mapping process.
+     * Maps a User entity to a ResponseUserDto.
      * @param entity
      * @return ResponseUserDto
      */
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "fundingSources", ignore = true)
     ResponseUserDto toResponseDto(User entity);
 
     /**
