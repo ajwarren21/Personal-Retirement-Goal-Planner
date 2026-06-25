@@ -14,6 +14,7 @@ import com.skillstorm.models.User;
 
 
 public record ResponseRetirementGoalDto(
+    long id,
     User user,
     String name,
     Integer targetRetirementAge,
