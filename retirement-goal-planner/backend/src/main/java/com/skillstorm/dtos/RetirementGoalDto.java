@@ -14,7 +14,6 @@ import jakarta.validation.constraints.PastOrPresent;
 
 
 public record RetirementGoalDto(
-    long id,
     User user,
     String name,
     Integer targetRetirementAge,

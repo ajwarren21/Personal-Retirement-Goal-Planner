@@ -19,7 +19,6 @@ import com.skillstorm.models.User;
 // import jakarta.validation.constraints.PastOrPresent;
 
 public record ContributionDto(
-    long id,
     User user,
     RetirementGoal goal,
     FundingSource fundingSource,

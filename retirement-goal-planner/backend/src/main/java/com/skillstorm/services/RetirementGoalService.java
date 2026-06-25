@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.skillstorm.dtos.ResponseRetirementGoalDto;
 import com.skillstorm.dtos.RetirementGoalDto;
+import com.skillstorm.exceptions.GoalNotFoundException;
 import com.skillstorm.mappers.RetirementGoalMapper;
 import com.skillstorm.models.RetirementGoal;
 import com.skillstorm.repositories.RetirementGoalRepository;
@@ -26,7 +27,7 @@ public class RetirementGoalService {
     }
 
     public ResponseRetirementGoalDto getById(long id) {
-        RetirementGoal r = repo.findById(id).orElseThrow();
+        RetirementGoal r = repo.findById(id).orElseThrow(() -> new GoalNotFoundException(id));
         return mapper.toDto(r);
     }
 
@@ -34,8 +35,8 @@ public class RetirementGoalService {
         return mapper.toDto(repo.save(mapper.toEntity(dto)));
     }
 
-    public ResponseRetirementGoalDto update(RetirementGoalDto dto) {
-        RetirementGoal r = repo.findById(dto.id()).orElseThrow();
+    public ResponseRetirementGoalDto update(long id, RetirementGoalDto dto) {
+        RetirementGoal r = repo.findById(id).orElseThrow(() -> new GoalNotFoundException(id));
         mapper.updateEntityFromDto(dto, r);
 
         repo.save(r);
@@ -43,7 +44,7 @@ public class RetirementGoalService {
     }
 
     public void delete(long id) {
-        RetirementGoal r = repo.findById(id).orElseThrow();
+        RetirementGoal r = repo.findById(id).orElseThrow(() -> new GoalNotFoundException(id));
         repo.delete(r);
     }
 

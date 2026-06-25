@@ -14,6 +14,7 @@ import com.skillstorm.models.User;
 
 
 public record ResponseContributionDto(
+    long id,
     User user,
     RetirementGoal goal,
     FundingSource fundingSource,

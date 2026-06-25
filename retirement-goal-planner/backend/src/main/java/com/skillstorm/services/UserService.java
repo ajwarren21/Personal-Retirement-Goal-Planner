@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.skillstorm.dtos.ResponseUserDto;
 import com.skillstorm.dtos.UserDto;
+import com.skillstorm.exceptions.UserNotFoundException;
 import com.skillstorm.mappers.UserMapper;
 import com.skillstorm.repositories.UserRepository;
 
@@ -23,7 +24,7 @@ public class UserService {
     }
 
     public ResponseUserDto getById(long id) {
-        return mapper.toResponseDto(repo.findById(id).orElseThrow());
+        return mapper.toResponseDto(repo.findById(id).orElseThrow(() -> new UserNotFoundException(id)));
     }
 
     public ResponseUserDto create(UserDto dto) {
@@ -31,7 +32,7 @@ public class UserService {
     }
 
     public ResponseUserDto update(long id, UserDto dto) {
-        var entity = repo.findById(id).orElseThrow();
+        var entity = repo.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         mapper.updateEntityFromDto(dto, entity);
         return mapper.toResponseDto(repo.save(entity));
     }
