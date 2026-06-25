@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.skillstorm.dtos.FundingSourceDto;
 import com.skillstorm.dtos.ResponseFundingSourceDto;
+import com.skillstorm.exceptions.SourceNotFoundException;
 import com.skillstorm.mappers.FundingSourceMapper;
 import com.skillstorm.repositories.FundingSourceRepository;
 
@@ -23,7 +24,7 @@ public class FundingSourceService {
     }
 
     public ResponseFundingSourceDto getFundingSourceById(long id) {
-        return mapper.toDto(repo.findById(id).orElseThrow());
+        return mapper.toDto(repo.findById(id).orElseThrow(() -> new SourceNotFoundException(id)));
     }
 
     public ResponseFundingSourceDto createFundingSource(FundingSourceDto dto) {
@@ -31,7 +32,7 @@ public class FundingSourceService {
     }
 
     public ResponseFundingSourceDto updateFundingSource(long id, FundingSourceDto dto) {
-        var entity = repo.findById(id).orElseThrow();
+        var entity = repo.findById(id).orElseThrow(() -> new SourceNotFoundException(id));
         mapper.updateEntityFromDto(dto, entity);
         return mapper.toDto(repo.save(entity));
     }
