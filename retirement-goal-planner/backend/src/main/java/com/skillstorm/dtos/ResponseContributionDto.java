@@ -20,5 +20,6 @@ public record ResponseContributionDto(
     FundingSource fundingSource,
     BigDecimal amount,
     LocalDate contributionDate,
-    ContributionCategory category
+    ContributionCategory category,
+    String notes
 ) {}
