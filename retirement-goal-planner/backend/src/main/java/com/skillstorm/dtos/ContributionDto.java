@@ -8,8 +8,8 @@ import java.time.LocalDate;
 
 import com.skillstorm.enums.ContributionCategory;
 // import com.skillstorm.models.Contribution;
-import com.skillstorm.models.FundingSource;
-import com.skillstorm.models.RetirementGoal;
+// import com.skillstorm.models.FundingSource;
+// import com.skillstorm.models.RetirementGoal;
 import com.skillstorm.models.User;
 
 // import jakarta.validation.constraints.DecimalMin;
@@ -20,8 +20,8 @@ import com.skillstorm.models.User;
 
 public record ContributionDto(
     User user,
-    RetirementGoal goal,
-    FundingSource fundingSource,
+    long RetirementGoalId,
+    long fundingSourceId,
     BigDecimal amount,
     LocalDate contributionDate,
     ContributionCategory category
