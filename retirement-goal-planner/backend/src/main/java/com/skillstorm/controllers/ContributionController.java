@@ -45,7 +45,7 @@ public class ContributionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseContributionDto> getById(@RequestParam long id) {
+    public ResponseEntity<ResponseContributionDto> getById(@PathVariable long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 

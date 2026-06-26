@@ -44,7 +44,7 @@ public class RetirementGoalController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseRetirementGoalDto> getById(@RequestParam long id) {
+    public ResponseEntity<ResponseRetirementGoalDto> getById(@PathVariable long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
