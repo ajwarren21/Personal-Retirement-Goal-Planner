@@ -19,6 +19,6 @@ public record ResponseRetirementGoalDto(
     String name,
     Integer targetRetirementAge,
     BigDecimal targetAmount,
-    List<Contribution> contributions
-    
+    List<Contribution> contributions,
+    String notes
 ) {}

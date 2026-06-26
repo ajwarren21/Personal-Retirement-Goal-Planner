@@ -48,8 +48,8 @@ public class ContributionService {
 
     public ResponseContributionDto create(ContributionDto dto) {
         // need to find the referenced entitites first
-        RetirementGoal goal = retireRepo.findById(dto.goal().getId()).orElseThrow(() -> new GoalNotFoundException(dto.goal().getId()));
-        FundingSource fundingSource = fundingRepo.findById(dto.fundingSource().getId()).orElseThrow(() -> new SourceNotFoundException(dto.fundingSource().getId()));
+        RetirementGoal goal = retireRepo.findById(dto.RetirementGoalId()).orElseThrow(() -> new GoalNotFoundException(dto.RetirementGoalId()));
+        FundingSource fundingSource = fundingRepo.findById(dto.fundingSourceId()).orElseThrow(() -> new SourceNotFoundException(dto.fundingSourceId()));
  
         Contribution c = mapper.toEntity(dto);
  
