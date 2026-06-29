@@ -1,0 +1,29 @@
+<div class="login-bg">
+  <div class="login-card">
+
+    <div class="login-logo">
+      <h1>What are we calling it?</h1>
+      <p>Sign in to your account</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+      <div class="form-field">
+        <label>Email address</label>
+        <input type="email" formControlName="email">
+      </div>
+
+      <div class="form-field">
+        <label>Password</label>
+        <input type="password" formControlName="password">
+      </div>
+
+      @if (errorMessage) {
+        <p class="error">{{ errorMessage }}</p>
+      }
+
+      <button type="submit">Sign In</button>
+    </form>
+
+  </div>
+</div>
