@@ -35,7 +35,7 @@ public class RetirementGoalController {
 
     public RetirementGoalController(RetirementGoalService service) {
         this.service = service;
-        // this.responseRetirementGoalDto = responseRetirementGoalDto;
+        // this.responseRetirem``entGoalDto = responseRetirementGoalDto;
     }
 
     @GetMapping
