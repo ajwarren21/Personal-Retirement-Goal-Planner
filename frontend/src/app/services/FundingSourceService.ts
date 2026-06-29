@@ -8,7 +8,7 @@ import { catchError, Observable, throwError } from "rxjs";
 export class FundingSourceService {
 
 
-    private readonly URL = `http:localhost:5432/funding-source`;
+    private readonly URL = `http://localhost:8080/funding-source`;
 
 
     constructor(private http: HttpClient){}
