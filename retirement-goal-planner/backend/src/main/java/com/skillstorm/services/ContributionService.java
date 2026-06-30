@@ -1,5 +1,7 @@
 package com.skillstorm.services;
 
+import org.springframework.stereotype.Service;
+
 import com.skillstorm.dtos.ContributionDto;
 import com.skillstorm.dtos.ResponseContributionDto;
 import com.skillstorm.exceptions.ContributionNotFoundException;
@@ -13,6 +15,7 @@ import com.skillstorm.repositories.ContributionRepository;
 import com.skillstorm.repositories.FundingSourceRepository;
 import com.skillstorm.repositories.RetirementGoalRepository;
 
+@Service
 public class ContributionService {
 
     private final ContributionRepository repo;

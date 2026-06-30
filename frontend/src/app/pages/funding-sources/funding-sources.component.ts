@@ -42,7 +42,7 @@ export class FundingSourcesComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set('Failed to load funding sources. Make sure the backend is running.');
+        this.error.set('Failed to load funding sources.');
         this.loading.set(false);
         console.error(err);
       }
