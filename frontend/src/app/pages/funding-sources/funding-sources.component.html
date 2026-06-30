@@ -1,0 +1,91 @@
+<div class="p-6 max-w-6xl mx-auto">
+
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-800">Funding Sources</h1>
+      <p class="text-gray-500 text-sm mt-1">All retirement accounts linked to your profile</p>
+    </div>
+    <button
+      pButton
+      label="Add Funding Source"
+      icon="pi pi-plus"
+      class="p-button-sm">
+    </button>
+  </div>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="flex justify-center items-center h-48">
+      <p-progress-spinner strokeWidth="4" />
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (error()) {
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!loading() && !error()) {
+    <p-table
+      [value]="fundingSources()"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[5, 10, 25]"
+      styleClass="p-datatable-striped"
+      [tableStyle]="{ 'min-width': '60rem' }">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="name">
+            Name <p-sortIcon field="name" />
+          </th>
+          <th pSortableColumn="sourceType">
+            Type <p-sortIcon field="sourceType" />
+          </th>
+          <th pSortableColumn="institution">
+            Institution <p-sortIcon field="institution" />
+          </th>
+          <th>Notes</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-source>
+        <tr>
+          <td class="font-medium">{{ source.name }}</td>
+          <td>{{source.sourceType}}</td>
+          <td>{{ source.institution }}</td>
+          <td class="text-gray-500 text-sm">{{ source.notes || '—' }}</td>
+          <td>
+            <div class="flex gap-2">
+              <button
+                pButton
+                icon="pi pi-pencil"
+                class="p-button-sm p-button-text p-button-secondary">
+              </button>
+              <button
+                pButton
+                icon="pi pi-trash"
+                class="p-button-sm p-button-text p-button-danger">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center text-gray-500 py-8">
+            No funding sources found. Add one to get started.
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+  }
+
+</div>
