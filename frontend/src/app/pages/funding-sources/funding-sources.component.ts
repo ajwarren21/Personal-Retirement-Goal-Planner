@@ -12,7 +12,6 @@ import { TextareaModule } from 'primeng/textarea';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { FundingSourceService } from '../../services/FundingSourceService';
 import { FundingSource } from '../../types/FundingSource';
-import { SourceType } from '../../types/SourceType';
 
 @Component({
   selector: 'app-funding-sources',
@@ -183,20 +182,4 @@ export class FundingSourcesComponent implements OnInit {
       }
     });
   }
-
-  // formatSourceType(sourceType: string): string {
-  //   return (SourceType as Record<string, string>)[sourceType] ?? sourceType;
-  // }
-
-  // getSourceTypeSeverity(sourceType: string): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' | null | undefined {
-  //   const severities: Record<string, 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast'> = {
-  //     TRADITIONAL_401K: 'info',
-  //     ROTH_401K: 'success',
-  //     TRADITIONAL_IRA: 'info',
-  //     ROTH_IRA: 'success',
-  //     SEP_IRA: 'warn',
-  //     TAXABLE_BROKERAGE: 'secondary'
-  //   };
-  //   return severities[sourceType] ?? 'info';
-  // }
 }
