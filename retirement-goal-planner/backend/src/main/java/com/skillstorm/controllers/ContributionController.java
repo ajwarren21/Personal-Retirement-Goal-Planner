@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("/goals")
-@CrossOrigin(origins = {"http://localhost:5500", "http://127.0.0.1:5500"})
+@RequestMapping("/contributions")
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:5500", "http://127.0.0.1:5500"})
 public class ContributionController {
 
     // private final ResponseContributionDto responseContributionDto;
