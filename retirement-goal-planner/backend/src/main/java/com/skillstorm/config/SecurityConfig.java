@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.skillstorm.services.AuthService;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -66,10 +68,10 @@ public class SecurityConfig {
     }
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private AuthService authservice;
 
-    public SecurityConfig(UserDetailsService service) {
-        this.userDetailsService = service;
+    public SecurityConfig(AuthService service) {
+        this.authservice = service;
     }
 
     @Bean
@@ -77,7 +79,7 @@ public class SecurityConfig {
         AuthenticationManagerBuilder builder =
             http.getSharedObject(AuthenticationManagerBuilder.class);
         builder
-            .userDetailsService(userDetailsService)
+            .userDetailsService(authservice)
             .passwordEncoder(passwordEncoder());
         return builder.build();
     }
