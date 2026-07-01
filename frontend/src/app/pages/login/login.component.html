@@ -5,12 +5,18 @@
       <div class="login-logo-icon">
         <i class="ti ti-chart-line"></i>
       </div>
-      <h1>NAME (idk for now)</h1>
-      <p>Sign in to your account</p>
+      <h1>{{ isLoggingIn ? 'IDK yet' : 'Create Account'}}</h1>
+      <p>{{ isLoggingIn ? 'Sign in to your account' : 'Register a new account'}}</p>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
+      @if (!isLoggingIn) {
+        <div class="form-field">
+          <label for="username">Username</label>
+          <input id="username" type="text" formControlName="username" placeholder="Gage21">
+        </div>
+      }
       <div class="form-field">
         <label for="email">Email address</label>
         <input id="email" type="email" formControlName="email" placeholder="name@example.com">
@@ -24,16 +30,22 @@
       @if (errorMessage) {
         <p class="error">{{ errorMessage }}</p>
       }
+      @if (successMessage) {
+        <p class="success">{{ successMessage }}</p>
+      }
 
-      <button type="submit" [disabled]="form.invalid">Sign in</button>
+      <button pButton type="submit" [disabled]="form.invalid" [label]="isLoggingIn ? 'Sign In' : 'Register Account'"></button>
       <!-- <div class="flex justify-center">
             <button pButton disabled>Submit</button>
         </div> -->
     </form>
 
-    <div class="login-footer">
-      No account? <a routerLink="/register">Register</a> 
-    </div>
+   <div class="login-footer text-center mt-6 text-sm text-gray-500">
+      {{ isLoggingIn ? "No account?" : "Already have an account?" }}
+      <button type="button" (click)="toggleForm()" class="text-indigo-600 hover:underline font-medium bg-transparent border-none p-0 cursor-pointer">
+        {{ isLoggingIn ? 'Register' : 'Sign In' }}
+      </button>
+  </div>
 
   </div>
 </div>

@@ -24,6 +24,16 @@ export class AuthService {
     );
   }
 
+  register(user: any): Observable<any> {
+    return this.http.post(`${this.URL}/auth/register`, user)
+      .pipe(
+        catchError(error => {
+          console.error('Registration error:', error);
+          return throwError(() => new Error('Registration failed. Please try again.'));
+        })
+      );
+  }
+
   getToken(): string | null {
     const user = localStorage.getItem('user');
     if (!user) {

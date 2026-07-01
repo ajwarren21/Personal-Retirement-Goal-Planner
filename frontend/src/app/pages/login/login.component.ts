@@ -13,6 +13,9 @@ import { ButtonModule } from 'primeng/button';
 export class LoginComponent {
 
   form! : FormGroup; 
+  isLoggingIn = true;
+  errorMessage = '';
+  successMessage = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -32,7 +35,19 @@ export class LoginComponent {
 
   }
 
-  errorMessage = '';
+  toggleForm() {
+    this.isLoggingIn = !this.isLoggingIn;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    if (!this.isLoggingIn) {
+      this.form.addControl('username', this.formBuilder.control('', Validators.required));
+    } else {
+      this.form.removeControl('username');
+    }
+  }
+
+  
 
   onSubmit() {
     if (this.form.invalid) {
@@ -40,6 +55,10 @@ export class LoginComponent {
       return;
     }
 
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    if (this.isLoggingIn) {
     this.authService.login(this.form.value as any).subscribe({
       next: (response) => {
         console.log('Login success', response);
@@ -48,5 +67,18 @@ export class LoginComponent {
         this.errorMessage = 'Invalid credentials';
       }
     });
+  } else {
+    this.authService.register(this.form.value as any).subscribe({
+      next: (response) => {
+        console.log('Registration success', response);
+        this.successMessage = 'Registration successful! Please log in.';
+        this.toggleForm();
+      },
+      error: () => {
+        this.errorMessage = 'Registration failed. Please try again.';
+      }
+    }); 
   }
+}
+
 }
