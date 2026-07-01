@@ -1,11 +1,12 @@
 package com.skillstorm.models;
 
+import java.util.List;
+
 import com.skillstorm.enums.SourceType;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.*;
 
 
@@ -41,5 +42,8 @@ public class FundingSource {
 
     @Column(columnDefinition = "TEXT")
     private String notes;
+
+    @OneToMany(mappedBy = "fundingSource", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Contribution> contributions;
 
 }
