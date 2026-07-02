@@ -4,6 +4,7 @@ import { catchError, Observable, throwError } from "rxjs";
 import { LoginRequest } from '../types/login-request';
 import { environment } from "../environments/environments";
 import { Router } from '@angular/router';
+import {User} from '../types/user';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -22,6 +23,14 @@ export class AuthService {
   logout(): void {
     // need to remove token the route to the login page
     this.router.navigate(['/login']);
+  }
+
+  // Will hit the backend authservice /auth/me, but it isn't working for now
+  // getCurrentUser(): User {}
+
+  // temp get user by id 1
+  getUser(): Observable<any> {
+    return this.http.get(`${this.URL}/users/1`);
   }
 }
 
