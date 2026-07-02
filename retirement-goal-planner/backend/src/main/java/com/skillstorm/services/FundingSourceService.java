@@ -1,26 +1,32 @@
 package com.skillstorm.services;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.skillstorm.dtos.FundingSourceDto;
 import com.skillstorm.dtos.ResponseFundingSourceDto;
 import com.skillstorm.exceptions.SourceNotFoundException;
 import com.skillstorm.mappers.FundingSourceMapper;
+import com.skillstorm.models.User;
 import com.skillstorm.repositories.FundingSourceRepository;
+import com.skillstorm.repositories.UserRepository;
 
 @Service
 public class FundingSourceService {
 
     private final FundingSourceRepository repo;
+    private final UserRepository userRepository;
     private final FundingSourceMapper mapper;
 
-    public FundingSourceService(FundingSourceRepository repo, FundingSourceMapper mapper) {
+    public FundingSourceService(FundingSourceRepository repo, FundingSourceMapper mapper, UserRepository userRepository) {
         this.repo = repo;
         this.mapper = mapper;
+        this.userRepository = userRepository;
     }
 
-    public Iterable<ResponseFundingSourceDto> getAllFundingSources() {
-        return repo.findAll().stream().map(mapper::toDto).toList();
+    public Iterable<ResponseFundingSourceDto> getAllFundingSources(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        return repo.findByUserId(user.getId()).stream().map(mapper::toDto).toList();
     }
 
     public ResponseFundingSourceDto getFundingSourceById(long id) {

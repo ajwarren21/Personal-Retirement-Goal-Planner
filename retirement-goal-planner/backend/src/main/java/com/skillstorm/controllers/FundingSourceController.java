@@ -2,6 +2,8 @@ package com.skillstorm.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,8 +35,9 @@ public class FundingSourceController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<ResponseFundingSourceDto>> getAll() {
-        return ResponseEntity.ok(service.getAllFundingSources());
+    public ResponseEntity<Iterable<ResponseFundingSourceDto>> getAll(@AuthenticationPrincipal String email) {
+        
+        return ResponseEntity.ok(service.getAllFundingSources(email));
     }
 
     @GetMapping("/{id}")

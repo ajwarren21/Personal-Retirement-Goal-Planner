@@ -3,7 +3,7 @@ package com.skillstorm.mappers;
 import org.mapstruct.Mapper;
 // import org.springframework.web.bind.annotation.Mapping;
 
-// import org.mapstruct.Mapper;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 

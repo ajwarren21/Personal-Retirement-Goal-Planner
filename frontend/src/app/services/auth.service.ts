@@ -17,7 +17,7 @@ export class AuthService {
     // This doesn't actually do anything yet but it will hit this for login
     // also endpoint is not correct yet either
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.URL}/auth/login`, credentials)
+    return this.http.post<AuthResponse>(`${this.URL}api/auth/login`, credentials)
       .pipe(tap(response => {
         localStorage.setItem('user', JSON.stringify(response));
       })
@@ -25,7 +25,7 @@ export class AuthService {
   }
 
   register(user: any): Observable<any> {
-    return this.http.post(`${this.URL}/auth/register`, user)
+    return this.http.post(`${this.URL}api/auth/register`, user)
       .pipe(
         catchError(error => {
           console.error('Registration error:', error);

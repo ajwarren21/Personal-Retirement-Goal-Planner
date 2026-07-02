@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ButtonModule } from 'primeng/button';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ export class LoginComponent {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private router: Router
   ){}
 
   ngOnInit(): void {
@@ -62,6 +64,8 @@ export class LoginComponent {
     this.authService.login(this.form.value as any).subscribe({
       next: (response) => {
         console.log('Login success', response);
+        this.successMessage = 'Login successful! Redirecting...';
+        this.router.navigate(['/funding-sources']); 
       },
       error: () => {
         this.errorMessage = 'Invalid credentials';
