@@ -1,75 +1,218 @@
-.profile-container {
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+
+:host {
+  --ink: #1b2a4a;
+  --ink-soft: #2c4270;
+  --parchment: #faf6ef;
+  --paper: #ffffff;
+  --gold: #c9a227;
+  --slate: #64748b;
+  --hairline: #e4ddcd;
+  --rose: #b3261e;
+  display: block;
+}
+
+.profile-shell {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 1rem;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.profile-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  background: var(--parchment);
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  box-shadow:
+    0 20px 45px -22px rgba(27, 42, 74, 0.4),
+    0 1px 0 rgba(27, 42, 74, 0.06);
 }
 
 /* Header */
+.card-band {
+  height: 88px;
+  background: linear-gradient(135deg, var(--ink), var(--ink-soft));
+}
+
 .profile-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.4rem;
+  margin-top: -44px;
+  padding: 0 1.5rem 1.25rem;
 }
 
-.profile-title h2 {
-  margin: 0;
-  font-size: 1.4rem;
+::ng-deep .profile-avatar {
+  width: 88px !important;
+  height: 88px !important;
+  font-size: 1.6rem !important;
+  font-family: 'Fraunces', serif;
   font-weight: 600;
+  background: var(--gold) !important;
+  color: var(--ink) !important;
+  border: 4px solid var(--parchment);
 }
 
-.profile-title .email {
-  font-size: 0.9rem;
-  color: #6b7280;
+.profile-name {
+  margin: 0.6rem 0 0;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.35rem;
+  color: var(--ink);
+  text-align: center;
 }
 
-/* Details */
-.profile-details {
+.name-skeleton {
+  margin-top: 0.9rem;
+}
+
+::ng-deep .verified-tag {
+  margin-top: 0.35rem;
+}
+
+::ng-deep .verified-tag .p-tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.6rem;
+}
+
+/* Perforation / eyelet divider, like a badge lanyard seam */
+.perforation {
+  position: relative;
+  height: 1px;
+  margin: 0 1.25rem;
+  border-top: 2px dashed var(--hairline);
+}
+
+.notch {
+  position: absolute;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--parchment);
+  border: 2px solid var(--gold);
+}
+
+.notch-left {
+  left: 0.25rem;
+}
+
+.notch-right {
+  right: 0.25rem;
+}
+
+/* Error */
+::ng-deep .profile-error {
+  display: block;
+  margin: 1rem 1.5rem 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+}
+
+/* Body */
+.profile-body {
+  padding: 1.5rem;
+}
+
+.credential-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
-.detail-row {
+.credential-row {
   display: flex;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  background: #f9fafb;
-  border-radius: 10px;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
 }
 
-.label {
+.credential-icon {
+  flex-shrink: 0;
+  width: 1.5rem;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--gold);
+}
+
+.credential-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.credential-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+.credential-value {
+  font-family: 'Inter', sans-serif;
   font-weight: 500;
-  color: #374151;
+  font-size: 0.95rem;
+  color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
-.value {
-  color: #111827;
+.credential-mono {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+}
+
+/* Edit form */
+.credential-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--slate);
+  padding-left: 0.15rem;
+}
+
+.form-field .w-full {
+  width: 100%;
+}
+
+.field-error {
+  color: var(--rose);
+  font-size: 0.75rem;
+  padding-left: 0.25rem;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Actions */
 .profile-actions {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 0.5rem;
-}
-
-.logout-btn {
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  background: #dc2626;
-}
-
-/* Error */
-.error {
-  color: #dc2626;
-  font-size: 0.9rem;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1.35rem;
+  flex-wrap: wrap;
 }
 
