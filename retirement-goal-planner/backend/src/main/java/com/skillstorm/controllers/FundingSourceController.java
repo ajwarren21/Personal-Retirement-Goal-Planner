@@ -34,11 +34,11 @@ public class FundingSourceController {
         this.service = service;
     }
 
-    @GetMapping
-    public ResponseEntity<Iterable<ResponseFundingSourceDto>> getAll(@AuthenticationPrincipal String email) {
+    // @GetMapping
+    // public ResponseEntity<Iterable<ResponseFundingSourceDto>> getAll(@AuthenticationPrincipal String email) {
         
-        return ResponseEntity.ok(service.getAllFundingSources(email));
-    }
+    //     return ResponseEntity.ok(service.getAllFundingSources(email));
+    // }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseFundingSourceDto> getById(@PathVariable long id) {

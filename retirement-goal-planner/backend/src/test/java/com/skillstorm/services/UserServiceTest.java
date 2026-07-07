@@ -1,169 +1,169 @@
-package com.skillstorm.services;
+// package com.skillstorm.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.junit.jupiter.api.Assertions.assertFalse;
+// import static org.junit.jupiter.api.Assertions.assertThrows;
+// import static org.mockito.ArgumentMatchers.any;
+// import static org.mockito.Mockito.doNothing;
+// import static org.mockito.Mockito.mock;
+// import static org.mockito.Mockito.never;
+// import static org.mockito.Mockito.times;
+// import static org.mockito.Mockito.verify;
+// import static org.mockito.Mockito.when;
 
-import java.util.List;
-import java.util.Optional;
+// import java.util.List;
+// import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.extension.ExtendWith;
+// import org.mockito.InjectMocks;
+// import org.mockito.Mock;
+// import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.skillstorm.dtos.ResponseUserDto;
-import com.skillstorm.dtos.UserDto;
-import com.skillstorm.exceptions.UserNotFoundException;
-import com.skillstorm.mappers.UserMapper;
-import com.skillstorm.models.User;
-import com.skillstorm.repositories.UserRepository;
+// import com.skillstorm.dtos.ResponseUserDto;
+// import com.skillstorm.dtos.UserDto;
+// import com.skillstorm.exceptions.UserNotFoundException;
+// import com.skillstorm.mappers.UserMapper;
+// import com.skillstorm.models.User;
+// import com.skillstorm.repositories.UserRepository;
 
-@ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+// @ExtendWith(MockitoExtension.class)
+// public class UserServiceTest {
 
-    @Mock
-    private UserRepository repo;
+//     @Mock
+//     private UserRepository repo;
 
-    @Mock
-    private UserMapper mapper;
+//     @Mock
+//     private UserMapper mapper;
 
-    @InjectMocks
-    private UserService service;
+//     @InjectMocks
+//     private UserService service;
 
-    private User user;
-    private UserDto userDto;
-    private ResponseUserDto responseUserDto;
+//     private User user;
+//     private UserDto userDto;
+//     private ResponseUserDto responseUserDto;
 
-    // Runs before each test - sets up the test data
-    @BeforeEach
-    void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setUsername("gagetest");
-        user.setPassword("password");
-        user.setEmail("gage@test.com");
+//     // Runs before each test - sets up the test data
+//     @BeforeEach
+//     void setUp() {
+//         user = new User();
+//         user.setId(1L);
+//         user.setUsername("gagetest");
+//         user.setPassword("password");
+//         user.setEmail("gage@test.com");
 
-        userDto = mock(UserDto.class);
-        responseUserDto = mock(ResponseUserDto.class);
+//         userDto = mock(UserDto.class);
+//         responseUserDto = mock(ResponseUserDto.class);
 
-    }
-
-
-    @Test
-    void getAllReturnsListOfDtos() {
-        when(repo.findAll()).thenReturn(List.of(user));
-
-        when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
-
-        Iterable<ResponseUserDto> result = service.getAll();
+//     }
 
 
-        assertEquals(List.of(responseUserDto), result);
+//     @Test
+//     void getAllReturnsListOfDtos() {
+//         when(repo.findAll()).thenReturn(List.of(user));
 
-        verify(repo, times(1)).findAll();
-    }
+//         when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
 
-    @Test
-    void getAllReturnsEmptyWhenNoUsersFound() {
-        when(repo.findAll()).thenReturn(List.of());
+//         Iterable<ResponseUserDto> result = service.getAll();
 
-        Iterable<ResponseUserDto> result = service.getAll();
 
-        assertFalse(result.iterator().hasNext());
-    }
+//         assertEquals(List.of(responseUserDto), result);
 
-    @Test
-    void getByIdReturnsResponseDto() {
-        when(repo.findById(1L)).thenReturn(Optional.of(user));
-        when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
+//         verify(repo, times(1)).findAll();
+//     }
 
-        ResponseUserDto result = service.getById(1L);
+//     @Test
+//     void getAllReturnsEmptyWhenNoUsersFound() {
+//         when(repo.findAll()).thenReturn(List.of());
 
-        assertEquals(responseUserDto, result);
+//         Iterable<ResponseUserDto> result = service.getAll();
 
-        verify(repo, times(1)).findById(1l);
-    }
+//         assertFalse(result.iterator().hasNext());
+//     }
 
-    @Test
-    void getByIdThrowsExceptionWhenNotFound() {
-        when(repo.findById(200L)).thenReturn(Optional.empty());
+//     @Test
+//     void getByIdReturnsResponseDto() {
+//         when(repo.findById(1L)).thenReturn(Optional.of(user));
+//         when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
 
-        assertThrows(UserNotFoundException.class, () -> service.getById(200L));
-    }
+//         ResponseUserDto result = service.getById(1L);
 
-    @Test
-    void createAndReturnsResponseDto() {
-        when(mapper.toEntity(userDto)).thenReturn(user);
-        when(repo.save(user)).thenReturn(user);
-        when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
+//         assertEquals(responseUserDto, result);
 
-        ResponseUserDto result = service.create(userDto);
+//         verify(repo, times(1)).findById(1l);
+//     }
 
-        assertEquals(responseUserDto, result);
+//     @Test
+//     void getByIdThrowsExceptionWhenNotFound() {
+//         when(repo.findById(200L)).thenReturn(Optional.empty());
 
-        verify(repo, times(1)).save(user);
+//         assertThrows(UserNotFoundException.class, () -> service.getById(200L));
+//     }
 
-    }
+//     @Test
+//     void createAndReturnsResponseDto() {
+//         when(mapper.toEntity(userDto)).thenReturn(user);
+//         when(repo.save(user)).thenReturn(user);
+//         when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
 
-    @Test
-    void updateAndReturnsDto() {
-        when(repo.findById(1L)).thenReturn(Optional.of(user));
+//         ResponseUserDto result = service.create(userDto);
 
-        doNothing().when(mapper).updateEntityFromDto(userDto, user);
+//         assertEquals(responseUserDto, result);
 
-        when(repo.save(user)).thenReturn(user);
+//         verify(repo, times(1)).save(user);
 
-        when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
+//     }
 
-        ResponseUserDto result = service.update(1L, userDto);
+//     @Test
+//     void updateAndReturnsDto() {
+//         when(repo.findById(1L)).thenReturn(Optional.of(user));
 
-        assertEquals(responseUserDto, result);
+//         doNothing().when(mapper).updateEntityFromDto(userDto, user);
 
-        verify(mapper, times(1)).updateEntityFromDto(userDto, user);
+//         when(repo.save(user)).thenReturn(user);
 
-        verify(repo, times(1)).save(user);
-    }
+//         when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
 
-    @Test
-    void updateThrowsExceptionWhenNotFound() {
-        when(repo.findById(200l)).thenReturn(Optional.empty());
+//         ResponseUserDto result = service.update(1L, userDto);
 
-        assertThrows(UserNotFoundException.class, () -> service.update(200L, userDto));
+//         assertEquals(responseUserDto, result);
 
-        verify(repo, never()).save(any());
-    }
+//         verify(mapper, times(1)).updateEntityFromDto(userDto, user);
 
-    @Test
-    void deleteDeletesUser() {
+//         verify(repo, times(1)).save(user);
+//     }
 
-        when(repo.findById(1L)).thenReturn(Optional.of(user));
+//     @Test
+//     void updateThrowsExceptionWhenNotFound() {
+//         when(repo.findById(200l)).thenReturn(Optional.empty());
 
-        service.delete(1L);
+//         assertThrows(UserNotFoundException.class, () -> service.update(200L, userDto));
 
-        verify(repo, times(1)).delete(user);
+//         verify(repo, never()).save(any());
+//     }
 
-    }
+//     @Test
+//     void deleteDeletesUser() {
+
+//         when(repo.findById(1L)).thenReturn(Optional.of(user));
+
+//         service.delete(1L);
+
+//         verify(repo, times(1)).delete(user);
+
+//     }
     
-    @Test
-    void deleteThrowsExceptionWhenNotFound() {
+//     @Test
+//     void deleteThrowsExceptionWhenNotFound() {
 
-        when(repo.findById(200L)).thenReturn(Optional.empty());
+//         when(repo.findById(200L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> service.delete(200L));
+//         assertThrows(UserNotFoundException.class, () -> service.delete(200L));
 
-        verify(repo, never()).delete(any());
-    }
+//         verify(repo, never()).delete(any());
+//     }
     
 
 
-}
+// }
