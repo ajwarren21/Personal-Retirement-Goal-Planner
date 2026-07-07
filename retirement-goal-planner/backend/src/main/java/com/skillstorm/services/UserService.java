@@ -9,10 +9,10 @@ import com.skillstorm.mappers.UserMapper;
 import com.skillstorm.models.User;
 import com.skillstorm.repositories.UserRepository;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.core.userdetails.UserDetails;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.core.userdetails.UsernameNotFoundException;
+// import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class UserService {
@@ -50,11 +50,11 @@ public class UserService {
         repo.delete(entity);
     }
 
-    public ResponseUserDto getUserByUsername(String email) {
-        User user = repo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+    // public ResponseUserDto getUserByUsername(String email) {
+    //     User user = repo.findByEmail(email).orElseThrow(() -> new UserNotFoundException(null));
 
-        return mapper.toResponseDto(user);
-    }
+    //     return mapper.toResponseDto(user);
+    // }
 
 
 }
