@@ -1,13 +1,13 @@
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { FundingSource } from "../types/FundingSource";
+import { RetirementGoal } from '../types/RetirementGoal';
 import { catchError, Observable, throwError } from "rxjs";
 import { environment } from "../environments/environments";
 import { AuthService } from "./auth.service";
 
 
 @Injectable({providedIn: "root"})
-export class FundingSourceService {
+export class RetirementGoalService {
 
 
     private readonly URL = `${environment.baseApiUrl}funding-source`;
@@ -17,7 +17,7 @@ export class FundingSourceService {
 
 
     
-    getFundingSources(): Observable<FundingSource[]> {
+    getRetirementGoals(): Observable<RetirementGoal[]> {
 
         const token = this.authService.getToken();
 
@@ -25,7 +25,7 @@ export class FundingSourceService {
             'Authorization': `Bearer ${token}`
         });
 
-        return this.http.get<FundingSource[]>(this.URL, { headers })
+        return this.http.get<RetirementGoal[]>(this.URL, { headers })
             .pipe(
                 catchError(
                     () => throwError(
@@ -35,13 +35,13 @@ export class FundingSourceService {
             );
     }
 
-    getFundingSourceById(id: number): Observable<FundingSource> {
+    getRetirementGoalById(id: number): Observable<RetirementGoal> {
          const token = this.authService.getToken();
 
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${token}`
         });
-        return this.http.get<FundingSource>(this.URL + `/${id}`, { headers })
+        return this.http.get<RetirementGoal>(this.URL + `/${id}`, { headers })
             .pipe(
                 catchError(
                     () => throwError(
@@ -51,13 +51,13 @@ export class FundingSourceService {
             );
     }
 
-    createFundingSource(fundingSource: FundingSource): Observable<FundingSource> {
+    createRetirementGoal(retirementGoal: RetirementGoal): Observable<RetirementGoal> {
          const token = this.authService.getToken();
 
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${token}`
         });
-        return this.http.post<FundingSource>(this.URL, fundingSource, { headers })
+        return this.http.post<RetirementGoal>(this.URL, retirementGoal, { headers })
             .pipe(
                 catchError(
                     () => throwError(
@@ -67,13 +67,13 @@ export class FundingSourceService {
             );
     }
 
-    udpateFundingSource(id: number, fundingSource: FundingSource): Observable<FundingSource> {
+    udpateRetirementGoal(id: number, retirementGoal: RetirementGoal): Observable<RetirementGoal> {
          const token = this.authService.getToken();
 
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${token}`
         });
-        return this.http.put<FundingSource>(this.URL + `/${id}`, fundingSource, { headers })
+        return this.http.put<RetirementGoal>(this.URL + `/${id}`, retirementGoal, { headers })
             .pipe(
                 catchError(
                     () => throwError(
@@ -83,7 +83,7 @@ export class FundingSourceService {
             );
     }
 
-    deleteFundingSource(id: number): Observable<void> {
+    deleteRetirementGoal(id: number): Observable<void> {
          const token = this.authService.getToken();
 
         const headers = new HttpHeaders({
@@ -100,3 +100,4 @@ export class FundingSourceService {
     }
 
 }
+
