@@ -1,5 +1,5 @@
 // Not sure what is needed yet, tbc
 export interface LoginRequest {
-    email: string;
+    username: string;
     password: string;
 }

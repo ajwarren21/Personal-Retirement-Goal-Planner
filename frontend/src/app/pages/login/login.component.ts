@@ -25,13 +25,14 @@ export class LoginComponent {
   ){}
 
   ngOnInit(): void {
-    // this.loadMovies();
-    // this.loadDirectors();
+   
+    this.authService.initCsrf().subscribe({
+    next: () => console.log('CSRF Token initialized successfully'),
+    error: (err) => console.error('Failed to initialize CSRF', err)
+    });
 
-    // using form builder to create the form group 
-    // form builder lets you initialize form with default values and validators
     this.form = this.formBuilder.group({
-      email: ["", [Validators.required, Validators.email]],
+      username: ["", [Validators.required]],
       password: ["", [Validators.required]]
     });
 
@@ -43,9 +44,9 @@ export class LoginComponent {
     this.successMessage = '';
 
     if (!this.isLoggingIn) {
-      this.form.addControl('username', this.formBuilder.control('', Validators.required));
+      this.form.addControl('email', this.formBuilder.control('', Validators.required));
     } else {
-      this.form.removeControl('username');
+      this.form.removeControl('email');
     }
   }
 
