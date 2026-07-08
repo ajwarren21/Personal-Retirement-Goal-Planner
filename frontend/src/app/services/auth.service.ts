@@ -2,9 +2,9 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { catchError, Observable, tap, throwError } from "rxjs";
 import { LoginRequest } from '../types/login-request';
-import { environment } from "../../environments/environments";
-import { AuthResponse } from "../types/auth-response";
-import {  Router } from "@angular/router";
+import { environment } from "../environments/environments";
+import { Router } from '@angular/router';
+import {User} from '../types/user';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -24,33 +24,17 @@ export class AuthService {
     );
   }
 
-  register(user: any): Observable<any> {
-    return this.http.post(`${this.URL}api/auth/register`, user)
-      .pipe(
-        catchError(error => {
-          console.error('Registration error:', error);
-          return throwError(() => new Error('Registration failed. Please try again.'));
-        })
-      );
-  }
-
-  getToken(): string | null {
-    const user = localStorage.getItem('user');
-    if (!user) {
-      return null;
-    }
-    return JSON.parse(user).token;
-  }
-
   logout(): void {
-    localStorage.removeItem('user');
+    // need to remove token the route to the login page
     this.router.navigate(['/login']);
   }
 
+  // Will hit the backend authservice /auth/me, but it isn't working for now
+  // getCurrentUser(): User {}
 
-
-
-
-
+  // temp get user by id 1
+  getUser(): Observable<any> {
+    return this.http.get(`${this.URL}/users/1`);
+  }
 }
 
