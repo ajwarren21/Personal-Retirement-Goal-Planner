@@ -1,21 +1,31 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { FundingSource } from "../types/FundingSource";
 import { catchError, Observable, throwError } from "rxjs";
+import { environment } from "../../environments/environments";
+import { AuthService } from "./auth.service";
 
 
 @Injectable({providedIn: "root"})
 export class FundingSourceService {
 
 
-    private readonly URL = `http://localhost:8080/funding-source`;
+    private readonly URL = `${environment.baseApiUrl}funding-source`;
 
 
-    constructor(private http: HttpClient){}
+    constructor(private http: HttpClient, private authService: AuthService){}
 
+
+    
     getFundingSources(): Observable<FundingSource[]> {
 
-        return this.http.get<FundingSource[]>(this.URL)
+        const token = this.authService.getToken();
+
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+        });
+
+        return this.http.get<FundingSource[]>(this.URL, { headers })
             .pipe(
                 catchError(
                     () => throwError(
@@ -26,7 +36,12 @@ export class FundingSourceService {
     }
 
     getFundingSourceById(id: number): Observable<FundingSource> {
-        return this.http.get<FundingSource>(this.URL + `/${id}`)
+         const token = this.authService.getToken();
+
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+        });
+        return this.http.get<FundingSource>(this.URL + `/${id}`, { headers })
             .pipe(
                 catchError(
                     () => throwError(
@@ -37,7 +52,12 @@ export class FundingSourceService {
     }
 
     createFundingSource(fundingSource: FundingSource): Observable<FundingSource> {
-        return this.http.post<FundingSource>(this.URL, fundingSource)
+         const token = this.authService.getToken();
+
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+        });
+        return this.http.post<FundingSource>(this.URL, fundingSource, { headers })
             .pipe(
                 catchError(
                     () => throwError(
@@ -48,7 +68,12 @@ export class FundingSourceService {
     }
 
     udpateFundingSource(id: number, fundingSource: FundingSource): Observable<FundingSource> {
-        return this.http.put<FundingSource>(this.URL + `/${id}`, fundingSource)
+         const token = this.authService.getToken();
+
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+        });
+        return this.http.put<FundingSource>(this.URL + `/${id}`, fundingSource, { headers })
             .pipe(
                 catchError(
                     () => throwError(
@@ -59,7 +84,12 @@ export class FundingSourceService {
     }
 
     deleteFundingSource(id: number): Observable<void> {
-        return this.http.delete<void>(this.URL + `/${id}`)
+         const token = this.authService.getToken();
+
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+        });
+        return this.http.delete<void>(this.URL + `/${id}`, { headers })
             .pipe(
                 catchError(
                     () => throwError(

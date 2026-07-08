@@ -17,12 +17,16 @@ import { ProfileComponent } from '../profile/profile.component';
 export class LoginComponent {
 
   form! : FormGroup; 
+  isLoggingIn = true;
+  errorMessage = '';
+  successMessage = '';
 
   
   
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private router: Router
   ){}
   
   ngOnInit(): void {
@@ -53,7 +57,19 @@ export class LoginComponent {
     this.showProfile = false;
   }
 
-  errorMessage = '';
+  toggleForm() {
+    this.isLoggingIn = !this.isLoggingIn;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    if (!this.isLoggingIn) {
+      this.form.addControl('username', this.formBuilder.control('', Validators.required));
+    } else {
+      this.form.removeControl('username');
+    }
+  }
+
+  
 
   onSubmit() {
     if (this.form.invalid) {
@@ -61,14 +77,31 @@ export class LoginComponent {
       return;
     }
 
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    if (this.isLoggingIn) {
     this.authService.login(this.form.value as any).subscribe({
       next: (response) => {
         console.log('Login success', response);
+        this.successMessage = 'Login successful! Redirecting...';
+        this.router.navigate(['/funding-sources']); 
       },
       error: () => {
         this.errorMessage = 'Invalid credentials';
       }
     });
+  } else {
+    this.authService.register(this.form.value as any).subscribe({
+      next: (response) => {
+        console.log('Registration success', response);
+        this.successMessage = 'Registration successful! Please log in.';
+        this.toggleForm();
+      },
+      error: () => {
+        this.errorMessage = 'Registration failed. Please try again.';
+      }
+    }); 
   }
 }
 

@@ -1,60 +1,101 @@
 package com.skillstorm.services;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.skillstorm.dtos.ResponseUserDto;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.skillstorm.dtos.UserDto;
-import com.skillstorm.exceptions.UserNotFoundException;
-import com.skillstorm.mappers.UserMapper;
+import com.skillstorm.models.Role;
 import com.skillstorm.models.User;
+import com.skillstorm.repositories.RoleRepository;
 import com.skillstorm.repositories.UserRepository;
 
-// import org.springframework.security.core.userdetails.UserDetails;
-// import org.springframework.security.core.userdetails.UserDetailsService;
-// import org.springframework.security.core.userdetails.UsernameNotFoundException;
-// import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
-public class UserService {
-    
-    private final UserRepository repo;
-    private final UserMapper mapper;
-    // private final PasswordEncoder pe;
+public class UserService implements UserDetailsService {
 
-    public UserService(UserRepository repo, UserMapper mapper) {
-        this.repo = repo;
-        this.mapper = mapper;
-        // this.pe = pe;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public Iterable<ResponseUserDto> getAll() {
-        return repo.findAll().stream().map(mapper::toResponseDto).toList();
+   
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        
+        // finding the user out of our database
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + username));
+
+        /**
+         * Need to convert roles into authorities
+         *      Roles in Database: USER, ADMIN, MANAGER, etc.
+         *      Spring Authorities: ROLE_USER, ROLE_ADMIN, ROLE_MANAGER, etc
+         */
+        Set<GrantedAuthority> authorities = user.getRoles().stream()
+            .map(Role::getName)
+            .map(name -> "ROLE_" + name)
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toSet());
+
+        /**
+         * Spring Security has its won "User" object. You could name your user model
+         * something like "AppUser" to avoid confusion with this Spring Security class
+         */
+        return new org.springframework.security.core.userdetails.User(
+            user.getUsername(),
+            user.getPassword(),
+            user.isEnabled(),
+            true,                   // accountNonExpired
+            true,                   // credentialsNonExpired
+            true,                   // accountNonLocked
+            authorities
+        );
+        
     }
 
-    public ResponseUserDto getById(long id) {
-        return mapper.toResponseDto(repo.findById(id).orElseThrow(() -> new UserNotFoundException(id)));
+    @Transactional
+    public User register(UserDto registeringUser) {
+
+        // check if the username already exists. returns null if it does
+        if(userRepository.existsByUsername(registeringUser.username())) {
+            return null;
+        }
+
+        // All new users will default to only having the USER role
+        Role userRole = roleRepository.findByName("USER")
+            .orElseThrow(() -> new IllegalStateException("User role is missing from database."));
+
+        User user = new User();
+        user.setUsername(registeringUser.username());
+
+        // making sure to hash password with bcrypt before putting in db
+        user.setPassword(passwordEncoder.encode(registeringUser.password()));   
+        user.setEnabled(true);
+        user.setRoles(Set.of(userRole));
+
+        return userRepository.save(user);
+        
     }
 
-    public ResponseUserDto create(UserDto dto) {
-        return mapper.toResponseDto(repo.save(mapper.toEntity(dto)));
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
-
-    public ResponseUserDto update(long id, UserDto dto) {
-        User entity = repo.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        mapper.updateEntityFromDto(dto, entity);
-        return mapper.toResponseDto(repo.save(entity));
-    }
-
-    public void delete(long id) {
-        User entity = repo.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        repo.delete(entity);
-    }
-
-    // public ResponseUserDto getUserByUsername(String email) {
-    //     User user = repo.findByEmail(email).orElseThrow(() -> new UserNotFoundException(null));
-
-    //     return mapper.toResponseDto(user);
-    // }
 
 
 }
