@@ -53,9 +53,10 @@ public class SecurityConfig {
             )
             
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/csrf")
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                .disable() // Disable CSRF protection for simplicity
+                // .ignoringRequestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/csrf")
+                // .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                // .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
             
             .addFilterAfter(new OncePerRequestFilter() {

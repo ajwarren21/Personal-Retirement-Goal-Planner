@@ -7,6 +7,7 @@ import com.skillstorm.dtos.FundingSourceDto;
 import com.skillstorm.dtos.ResponseFundingSourceDto;
 import com.skillstorm.exceptions.SourceNotFoundException;
 import com.skillstorm.mappers.FundingSourceMapper;
+import com.skillstorm.models.FundingSource;
 import com.skillstorm.models.User;
 import com.skillstorm.repositories.FundingSourceRepository;
 // import com.skillstorm.repositories.UserRepository;
@@ -34,9 +35,18 @@ public class FundingSourceService {
         return mapper.toDto(repo.findById(id).orElseThrow(() -> new SourceNotFoundException(id)));
     }
 
-    public ResponseFundingSourceDto createFundingSource(FundingSourceDto dto) {
-        return mapper.toDto(repo.save(mapper.toEntity(dto)));
+    public FundingSource createSourceForUser(FundingSource source, String username) {
+        // Find the user object in the DB
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // Link the funding source to this specific user profile
+        source.setUser(user);
+        
+        // Persist to database
+        return repo.save(source);
     }
+
 
     public ResponseFundingSourceDto updateFundingSource(long id, FundingSourceDto dto) {
         var entity = repo.findById(id).orElseThrow(() -> new SourceNotFoundException(id));
