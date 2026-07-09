@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 
 import { ProfileComponent } from '../profile/profile.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -30,20 +31,13 @@ export class LoginComponent {
   ){}
   
   ngOnInit(): void {
-<<<<<<< HEAD
    
     this.authService.initCsrf().subscribe({
     next: () => console.log('CSRF Token initialized successfully'),
     error: (err) => console.error('Failed to initialize CSRF', err)
     });
 
-=======
-    // this.loadMovies();
-    // this.loadDirectors();
-    
-    // using form builder to create the form group 
-    // form builder lets you initialize form with default values and validators
->>>>>>> 9b26f8bd217f6fdfeb1a57b931bf10efdd6885cd
+   
     this.form = this.formBuilder.group({
       username: ["", [Validators.required]],
       password: ["", [Validators.required]]
@@ -51,10 +45,6 @@ export class LoginComponent {
     
   }
   
-  // showProfile = signal(false);
-  // openProfile() {
-  //   this.showProfile.set(true);
-  // }
 
   showProfile = false;
 
@@ -115,61 +105,4 @@ export class LoginComponent {
 }
 
 
-
-// Old html, needed here:
-// <!-- <p-dialog
-//   header="Profile"
-//   [visible]="showProfile()"
-//   (visibleChange)="showProfile.set($event)"
-//   [modal]="true"
-//   [style]="{ width: '50rem' }"> -->
-//   <div class="login-bg">
-//     <div class="login-card">
-
-//       <div class="login-logo">
-//         <div class="login-logo-icon">
-//           <i class="ti ti-chart-line"></i>
-//         </div>
-//         <h1>NAME (idk for now)</h1>
-//         <p>Sign in to your account</p>
-//       </div>
-
-//       <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
-//         <div class="form-field">
-//           <label for="email">Email address</label>
-//           <input id="email" type="email" formControlName="email" placeholder="name@example.com">
-//         </div>
-
-//         <div class="form-field">
-//           <label for="password">Password</label>
-//           <input id="password" type="password" formControlName="password" placeholder="••••••••">
-//         </div>
-
-//         @if (errorMessage) {
-//           <p class="error">{{ errorMessage }}</p>
-//         }
-
-//         <button type="submit" [disabled]="form.invalid">Sign in</button>
-//         <!-- <div class="flex justify-center">
-//               <button pButton disabled>Submit</button>
-//             </div> -->
-//             <!-- <p-button 
-//               label="Open Profile"
-//               (onClick)="openProfile()">
-//             </p-button> -->
-            
-//       </form>
-
-//       <div class="login-footer">
-//         No account? <a routerLink="/register">Register</a> 
-//       </div>
-//       <!-- <p-button 
-//               label="Open Profile"
-//               (onClick)="openProfile()">
-//             </p-button> -->
-
-//     </div>
-//   </div>
-
-// <!-- </p-dialog> -->
+}

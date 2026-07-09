@@ -2,14 +2,9 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { catchError, Observable, tap, throwError } from "rxjs";
 import { LoginRequest } from '../types/login-request';
-<<<<<<< HEAD
-import { environment } from "../../environments/environments";
-import { Router } from "@angular/router";
-=======
-import { environment } from "../environments/environments";
+import { environment } from '../../environments/environments';
 import { Router } from '@angular/router';
 import {User} from '../types/user';
->>>>>>> 9b26f8bd217f6fdfeb1a57b931bf10efdd6885cd
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -45,6 +40,9 @@ export class AuthService {
     .pipe(
       tap(userProfile => {
         localStorage.setItem('user', JSON.stringify(userProfile));
+        localStorage.setItem('token', authHeader); 
+      
+        console.log('Successfully saved auth token to localStorage:', authHeader);
       }),
       catchError(error => {
         console.error('Login error:', error);
@@ -53,7 +51,6 @@ export class AuthService {
     );
   }
 
-<<<<<<< HEAD
   register(user: any): Observable<any> {
     const headers = new HttpHeaders({
       'X-XSRF-TOKEN': this.csrfToken
@@ -80,23 +77,10 @@ export class AuthService {
     return localStorage.getItem('user') !== null;
   }
 
-=======
->>>>>>> 9b26f8bd217f6fdfeb1a57b931bf10efdd6885cd
   logout(): void {
     // need to remove token the route to the login page
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
-<<<<<<< HEAD
 }
-=======
-
-  // Will hit the backend authservice /auth/me, but it isn't working for now
-  // getCurrentUser(): User {}
-
-  // temp get user by id 1
-  getUser(): Observable<any> {
-    return this.http.get(`${this.URL}/users/1`);
-  }
-}
-
->>>>>>> 9b26f8bd217f6fdfeb1a57b931bf10efdd6885cd

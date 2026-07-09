@@ -1,5 +1,8 @@
 package com.skillstorm.controllers;
 
+import java.security.Principal;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,11 +19,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.skillstorm.dtos.FundingSourceDto;
 import com.skillstorm.dtos.ResponseFundingSourceDto;
+import com.skillstorm.models.FundingSource;
 import com.skillstorm.services.FundingSourceService;
 
 import jakarta.validation.Valid;
 
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -34,11 +37,11 @@ public class FundingSourceController {
         this.service = service;
     }
 
-    // @GetMapping
-    // public ResponseEntity<Iterable<ResponseFundingSourceDto>> getAll(@AuthenticationPrincipal String email) {
-        
-    //     return ResponseEntity.ok(service.getAllFundingSources(email));
-    // }
+   @GetMapping
+    public ResponseEntity<Iterable<ResponseFundingSourceDto>> getUserFundingSources(Principal principal) {
+        Iterable<ResponseFundingSourceDto> sources = service.getSourcesByUser(principal.getName());
+        return ResponseEntity.ok(sources);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseFundingSourceDto> getById(@PathVariable long id) {

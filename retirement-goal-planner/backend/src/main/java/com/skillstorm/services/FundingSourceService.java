@@ -10,24 +10,25 @@ import com.skillstorm.mappers.FundingSourceMapper;
 import com.skillstorm.models.User;
 import com.skillstorm.repositories.FundingSourceRepository;
 // import com.skillstorm.repositories.UserRepository;
+import com.skillstorm.repositories.UserRepository;
 
 @Service
 public class FundingSourceService {
 
     private final FundingSourceRepository repo;
-    // private final UserRepository userRepository;
+    private final UserRepository userRepository;
     private final FundingSourceMapper mapper;
 
-    public FundingSourceService(FundingSourceRepository repo, FundingSourceMapper mapper) {
+    public FundingSourceService(FundingSourceRepository repo, UserRepository userRepository, FundingSourceMapper mapper) {
         this.repo = repo;
         this.mapper = mapper;
-        // this.userRepository = userRepository;
+        this.userRepository = userRepository;
     }
 
-    // public Iterable<ResponseFundingSourceDto> getAllFundingSources(String email) {
-    //     // User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-    //     // return repo.findByUserId(user.getId()).stream().map(mapper::toDto).toList();
-    // }
+    public Iterable<ResponseFundingSourceDto> getSourcesByUser(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        return repo.findByUserId(user.getId()).stream().map(mapper::toDto).toList();
+    }
 
     public ResponseFundingSourceDto getFundingSourceById(long id) {
         return mapper.toDto(repo.findById(id).orElseThrow(() -> new SourceNotFoundException(id)));
