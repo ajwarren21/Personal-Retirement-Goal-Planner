@@ -19,7 +19,20 @@ spring:
     config:
         import: "optional:file:.env[.properties]"
 
+    security:
+        oauth2:
+            client:
+                registration:
+                    google:
+                        client-id: ${CLIENT-ID}
+                        client-secret: ${CLIENT-SECRET}
+                        scope:
+                            - openid
+                            - profile
+                            - email
+                        redirect-uri: ${REDIRECT-URI} 
 
 server:
     port: 8080
+
 

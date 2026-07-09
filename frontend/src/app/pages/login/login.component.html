@@ -1,16 +1,10 @@
-<div class="login-bg">
-  <div class="login-card">
 
-    <div class="login-logo">
-      <div class="login-logo-icon">
-        <i class="ti ti-chart-line"></i>
-      </div>
-      <h1>{{ isLoggingIn ? 'IDK yet' : 'Create Account'}}</h1>
-      <p>{{ isLoggingIn ? 'Sign in to your account' : 'Register a new account'}}</p>
-    </div>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+<p-dialog
+  header="Test"
+  [visible]="true">
 
+<<<<<<< HEAD
       @if (!isLoggingIn) {
         <div class="form-field">
         <label for="email">Email address</label>
@@ -25,27 +19,30 @@
         <label for="password">Password</label>
         <input id="password" type="password" formControlName="password" placeholder="••••••••">
       </div>
+=======
+  Hello world
+  <button type="button" (click)="openProfile()">
+  Open Profile Test
+</button>
 
-      @if (errorMessage) {
-        <p class="error">{{ errorMessage }}</p>
-      }
-      @if (successMessage) {
-        <p class="success">{{ successMessage }}</p>
-      }
+</p-dialog>
+>>>>>>> 9b26f8bd217f6fdfeb1a57b931bf10efdd6885cd
 
-      <button pButton type="submit" [disabled]="form.invalid" [label]="isLoggingIn ? 'Sign In' : 'Register Account'"></button>
-      <!-- <div class="flex justify-center">
-            <button pButton disabled>Submit</button>
-        </div> -->
-    </form>
+<p-dialog
+  header="Profile Test"
+  [(visible)]="showProfile"
+  [modal]="true"
+  [style]="{ width: '50rem' }">
 
-   <div class="login-footer text-center mt-6 text-sm text-gray-500">
-      {{ isLoggingIn ? "No account?" : "Already have an account?" }}
-      <button type="button" (click)="toggleForm()" class="text-indigo-600 hover:underline font-medium bg-transparent border-none p-0 cursor-pointer">
-        {{ isLoggingIn ? 'Register' : 'Sign In' }}
-      </button>
-  </div>
+  <!-- <div class="profile-test"> -->
+    <app-profile>
+    <h2>Profile Modal Working</h2>
+    <!-- <p>This is where your profile component will go.</p> -->
 
-  </div>
-</div>
+    <button type="button" (click)="closeProfile()">
+      Close
+    </button>
+  <!-- </div> -->
+   </app-profile>
 
+</p-dialog>

@@ -1,0 +1,95 @@
+<div class="profile-shell">
+  <div class="profile-card">
+
+    <div class="card-band"></div>
+
+    <div class="profile-header">
+      @if (!user && !errorMessage) {
+        <p-skeleton shape="circle" size="4.5rem" />
+        <p-skeleton width="9rem" height="1.25rem" styleClass="name-skeleton" />
+      } @else {
+        <p-avatar [label]="initials" size="xlarge" shape="circle" styleClass="profile-avatar" />
+        <h1 class="profile-name">{{ user?.name || 'Loading...' }}</h1>
+        @if (user) {
+          <p-tag value="Verified member" severity="success" styleClass="verified-tag" />
+        }
+      }
+    </div>
+
+    <div class="perforation" aria-hidden="true">
+      <span class="notch notch-left"></span>
+      <span class="notch notch-right"></span>
+    </div>
+
+    @if (errorMessage) {
+      <p-message severity="error" styleClass="profile-error">{{ errorMessage }}</p-message>
+    }
+
+    @if (user) {
+      <div class="profile-body">
+
+        @if (!isEditing) {
+
+          <div class="credential-list">
+            <div class="credential-row">
+              <i class="pi pi-user credential-icon"></i>
+              <div class="credential-text">
+                <span class="credential-label">Full name</span>
+                <span class="credential-value">{{ user.name }}</span>
+              </div>
+            </div>
+
+            <div class="credential-row">
+              <i class="pi pi-envelope credential-icon"></i>
+              <div class="credential-text">
+                <span class="credential-label">Email address</span>
+                <span class="credential-value credential-mono">{{ user.email }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-actions">
+            <p-button label="Edit profile" icon="pi pi-pencil" [outlined]="true" (onClick)="startEditing()" />
+            <p-button label="Log out" icon="pi pi-sign-out" severity="danger" [text]="true" (onClick)="onLogout()" />
+          </div>
+
+        } @else {
+
+          <form class="credential-form" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+
+            <div class="form-field">
+              <span class="form-label">Full name</span>
+              <p-iconfield>
+                <p-inputicon class="pi pi-user" />
+                <input pInputText formControlName="name" placeholder="Full name" class="w-full" />
+              </p-iconfield>
+              @if (profileForm.get('name')?.invalid && profileForm.get('name')?.touched) {
+                <small class="field-error">Enter at least 2 characters.</small>
+              }
+            </div>
+
+            <div class="form-field">
+              <span class="form-label">Email address</span>
+              <p-iconfield>
+                <p-inputicon class="pi pi-envelope" />
+                <input pInputText formControlName="email" placeholder="Email address" class="w-full" />
+              </p-iconfield>
+              @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+                <small class="field-error">Enter a valid email address.</small>
+              }
+            </div>
+
+            <div class="profile-actions">
+              <p-button type="submit" label="Save changes" icon="pi pi-check" [loading]="isSaving" [disabled]="profileForm.invalid" />
+              <p-button type="button" label="Cancel" [text]="true" [disabled]="isSaving" (onClick)="cancelEditing()" />
+            </div>
+
+          </form>
+
+        }
+
+      </div>
+    }
+
+  </div>
+</div>
