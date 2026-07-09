@@ -13,15 +13,9 @@ export class FundingSourceService {
 
 
  private getHttpOptions() {
-    const token = localStorage.getItem('token'); // Retrieve the saved basic auth string
-    console.log('--- DEBUGGING AUTH HEADER ---');
-    console.log('Token value found in localStorage:', token);
-    return {
-      headers: new HttpHeaders({
-        'Authorization': token ? token : ''
-      }),
-      withCredentials: true
-    };
+      return {
+    withCredentials: true
+  };
   }
 
   getFundingSources(): Observable<FundingSource[]> {
@@ -39,11 +33,14 @@ export class FundingSourceService {
   }
 
   createFundingSource(fundingSource: FundingSource): Observable<FundingSource> {
-    return this.http.post<FundingSource>(this.URL, fundingSource, this.getHttpOptions())
-      .pipe(
-        catchError(() => throwError(() => new Error("Failed to create Funding Source.")))
-      );
-  }
+  return this.http.post<FundingSource>(this.URL, fundingSource, this.getHttpOptions())
+    .pipe(
+      catchError((error) => {
+        console.error('Full backend error details:', error);
+        return throwError(() => new Error("Failed to create Funding Source."));
+      })
+    );
+}
 
   udpateFundingSource(id: number, fundingSource: FundingSource): Observable<FundingSource> {
     return this.http.put<FundingSource>(`${this.URL}/${id}`, fundingSource, this.getHttpOptions())

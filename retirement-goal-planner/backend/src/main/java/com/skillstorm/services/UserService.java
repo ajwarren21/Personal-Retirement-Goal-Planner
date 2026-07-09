@@ -38,10 +38,12 @@ public class UserService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         
+        System.out.println("Authenticating user: " + username);
+
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + username));
 
-        
+
          
         Set<GrantedAuthority> authorities = user.getRoles().stream()
             .map(Role::getName)

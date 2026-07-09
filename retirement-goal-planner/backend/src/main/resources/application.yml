@@ -1,5 +1,6 @@
 spring:
     
+    
     application:
         name: retirement_tracker
         version: 1.0.0
@@ -19,20 +20,12 @@ spring:
     config:
         import: "optional:file:.env[.properties]"
 
-    security:
-        oauth2:
-            client:
-                registration:
-                    google:
-                        client-id: ${CLIENT-ID}
-                        client-secret: ${CLIENT-SECRET}
-                        scope:
-                            - openid
-                            - profile
-                            - email
-                        redirect-uri: ${REDIRECT-URI} 
-
+   
 server:
     port: 8080
+
+logging:
+  level:
+    org.springframework.security: TRACE
 
 

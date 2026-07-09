@@ -10,7 +10,6 @@ import {User} from '../types/user';
 export class AuthService {
 
   private readonly URL = `${environment.baseApiUrl}`;
-  private csrfToken: string = '';
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -19,7 +18,6 @@ export class AuthService {
       .pipe(
         tap(res => {
           if (res && res.token) {
-            this.csrfToken = res.token;
           }
         })
       );
@@ -29,8 +27,7 @@ export class AuthService {
     const authHeader = 'Basic ' + btoa(`${credentials.username}:${credentials.password}`);
     
     const headers = new HttpHeaders({
-      'Authorization': authHeader,
-      'X-XSRF-TOKEN': this.csrfToken
+      'Authorization': authHeader
     });
 
     return this.http.post<any>(`${this.URL}api/auth/login`, {}, { 
@@ -52,12 +49,10 @@ export class AuthService {
   }
 
   register(user: any): Observable<any> {
-    const headers = new HttpHeaders({
-      'X-XSRF-TOKEN': this.csrfToken
-    });
+   
 
     return this.http.post(`${this.URL}api/auth/register`, user, {
-      headers,
+  
       withCredentials: true 
     })
     .pipe(

@@ -2,6 +2,7 @@ package com.skillstorm.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.skillstorm.enums.SourceType;
 
 import jakarta.persistence.*;
@@ -25,6 +26,7 @@ public class FundingSource {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 
     @NotBlank
