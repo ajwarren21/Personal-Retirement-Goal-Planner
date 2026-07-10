@@ -45,6 +45,7 @@ public class RetirementGoalController {
     @GetMapping
     public ResponseEntity<Iterable<ResponseRetirementGoalDto>> getUserRetirementGoals(Principal principal) {
         Iterable<ResponseRetirementGoalDto> goals = service.getGoalsByUser(principal.getName());
+        // goals.forEach(goal -> System.out.println("Retirement Goal ID: " + goal.id()));
         return ResponseEntity.ok(goals);
     }
 
