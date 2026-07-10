@@ -46,7 +46,7 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.profileForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
+      username: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
     });
     
@@ -56,45 +56,34 @@ export class ProfileComponent implements OnInit {
   }
   
   // profileForm: FormGroup = this.fb.group({
-  //   name: ['', [Validators.required, Validators.minLength(2)]],
+  //   username: ['', [Validators.required, Validators.minLength(2)]],
   //   email: ['', [Validators.required, Validators.email]],
   // });
 
   loadUser(): void {
-    // assumes AuthService exposes getCurrentUser(), but do not know what method it will actually call yet
-    // this.authService.getCurrentUser().subscribe({
-    //   next: (response: User) => {
-    //     this.user = response;
-    //     this.patchForm(response);
-    //   },
+    // AuthService.getUser() reads synchronously from localStorage — it's not
+    // an Observable, so no .subscribe() here.
+    const user = this.authService.getUser();
 
-    // making temp method for testing
-    this.authService.getUser().subscribe({
-      next: (response: User) => {
-        this.user = response;
-        this.patchForm(response);
-      },
-      error: () => {
-        this.errorMessage = 'Unable to load profile information';
-      }
-    });
+    if (user) {
+      this.user = user;
+      this.patchForm(user);
+    } else {
+      this.router.navigate(['/login']);
+      this.errorMessage = 'Unable to load profile information';
+    }
   }
 
   private patchForm(user: User): void {
     this.profileForm.patchValue({
-      name: user.name,
+      username: user.username,
       email: user.email,
     });
   }
 
   get initials(): string {
-    if (!this.user?.name) return '';
-    return this.user.name
-      .split(' ')
-      .map(part => part.charAt(0))
-      .join('')
-      .substring(0, 2)
-      .toUpperCase();
+    if (!this.user?.username) return '';
+    return this.user.username.substring(0, 2).toUpperCase();
   }
 
   startEditing(): void {
@@ -118,36 +107,22 @@ export class ProfileComponent implements OnInit {
 
     this.isSaving = true;
 
-    // Whatever the request looks like, the frontend just needs a response
-    // shaped like `User` back so it can replace `this.user` below.
-    const payload: Pick<User, 'name' | 'email'> = {
-      name: this.profileForm.value.name,
+    const payload: Pick<User, 'username' | 'email'> = {
+      username: this.profileForm.value.username,
       email: this.profileForm.value.email,
     };
 
-    // Swap this block out for the real call once I know what I am doing for the put, idk how user service is ganna be for now
-    // this.authService.updateUser(payload).subscribe({
-    //   next: (updated: User) => {
-    //     this.user = updated;
-    //     this.isEditing = false;
-    //     this.isSaving = false;
-    //   },
-    //   error: () => {
-    //     this.errorMessage = 'Unable to save profile changes';
-    //     this.isSaving = false;
-    //   }
-    // });
-
-    // making temp method for testing
-    this.mockSave(payload);
-  }
-
-  private mockSave(payload: Pick<User, 'name' | 'email'>): void {
-    setTimeout(() => {
-      this.user = { ...this.user, ...payload } as User;
-      this.isEditing = false;
-      this.isSaving = false;
-    }, 400);
+    this.authService.updateUser(payload).subscribe({
+      next: (updated: User) => {
+        this.user = updated;
+        this.isEditing = false;
+        this.isSaving = false;
+      },
+      error: () => {
+        this.errorMessage = 'Unable to save profile changes';
+        this.isSaving = false;
+      }
+    });
   }
 
   onLogout(): void {
@@ -155,4 +130,3 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 }
-

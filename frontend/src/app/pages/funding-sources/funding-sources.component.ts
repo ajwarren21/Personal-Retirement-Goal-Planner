@@ -12,6 +12,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { FundingSourceService } from '../../services/FundingSourceService';
 import { FundingSource } from '../../types/FundingSource';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-funding-sources',
@@ -57,7 +58,7 @@ export class FundingSourcesComponent implements OnInit {
 
   form!: FormGroup;
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder, private router: Router) {}
 
   ngOnInit(): void {
     this.loadFundingSources();
@@ -80,6 +81,7 @@ export class FundingSourcesComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
+        this.router.navigate(['/login']);
         this.error.set('Failed to load funding sources.');
         this.loading.set(false);
         console.error(err);

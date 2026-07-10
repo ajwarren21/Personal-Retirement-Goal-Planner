@@ -3,6 +3,8 @@ package com.skillstorm.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.skillstorm.dtos.UserDto;
+import com.skillstorm.dtos.UpdateUserDto;
+import com.skillstorm.dtos.ResponseUserDto;
 import com.skillstorm.models.User;
 import com.skillstorm.services.UserService;
 
@@ -18,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -66,6 +69,21 @@ public class AuthController {
         User loggedInUser = userService.getUserByUsername(principal.getName());
         
         return ResponseEntity.ok(loggedInUser);
+    }
+
+    @PutMapping("/user")
+    public ResponseEntity<ResponseUserDto> updateUser(Principal principal, @Valid @RequestBody UpdateUserDto updateRequest) {
+
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        ResponseUserDto updatedUser = userService.updateUser(principal.getName(), updateRequest);
+        if (updatedUser == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        return ResponseEntity.ok(updatedUser);
     }
    
 
