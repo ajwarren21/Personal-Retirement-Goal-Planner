@@ -10,93 +10,53 @@ import { AuthService } from "./auth.service";
 export class RetirementGoalService {
 
 
-    private readonly URL = `${environment.baseApiUrl}funding-source`;
-
-
-    constructor(private http: HttpClient, private authService: AuthService){}
-
-
+    private readonly URL = `${environment.baseApiUrl}goals`;
     
-    getRetirementGoals(): Observable<RetirementGoal[]> {
-
-        const token = this.authService.getToken();
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`
-        });
-
-        return this.http.get<RetirementGoal[]>(this.URL, { headers })
-            .pipe(
-                catchError(
-                    () => throwError(
-                        () => new Error("Failed to load Funding Sources.")
-                    )
-                )
-            );
+      constructor(private http: HttpClient) {}
+    
+    
+     private getHttpOptions() {
+          return {
+        withCredentials: true
+      };
+      }
+    
+      getRetirementGoals(): Observable<RetirementGoal[]> {
+        return this.http.get<RetirementGoal[]>(this.URL, this.getHttpOptions())
+          .pipe(
+            catchError(() => throwError(() => new Error("Failed to load Retirement Goals.")))
+          );
+      }
+    
+      getRetirementGoalById(id: number): Observable<RetirementGoal> {
+        return this.http.get<RetirementGoal>(`${this.URL}/${id}`, this.getHttpOptions())
+          .pipe(
+            catchError(() => throwError(() => new Error("Failed to load Retirement Goals.")))
+          );
+      }
+    
+      createRetirementGoal(retirementGoal: RetirementGoal): Observable<RetirementGoal> {
+      return this.http.post<RetirementGoal>(this.URL, retirementGoal, this.getHttpOptions())
+        .pipe(
+          catchError((error) => {
+            console.error('Full backend error details:', error);
+            return throwError(() => new Error("Failed to create Retirement Goal."));
+          })
+        );
     }
-
-    getRetirementGoalById(id: number): Observable<RetirementGoal> {
-         const token = this.authService.getToken();
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`
-        });
-        return this.http.get<RetirementGoal>(this.URL + `/${id}`, { headers })
-            .pipe(
-                catchError(
-                    () => throwError(
-                        () => new Error("Failed to load Funding Source.")
-                    )
-                )
-            );
-    }
-
-    createRetirementGoal(retirementGoal: RetirementGoal): Observable<RetirementGoal> {
-         const token = this.authService.getToken();
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`
-        });
-        return this.http.post<RetirementGoal>(this.URL, retirementGoal, { headers })
-            .pipe(
-                catchError(
-                    () => throwError(
-                        () => new Error("Failed to create Funding Source.")
-                    )
-                )
-            );
-    }
-
-    udpateRetirementGoal(id: number, retirementGoal: RetirementGoal): Observable<RetirementGoal> {
-         const token = this.authService.getToken();
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`
-        });
-        return this.http.put<RetirementGoal>(this.URL + `/${id}`, retirementGoal, { headers })
-            .pipe(
-                catchError(
-                    () => throwError(
-                        () => new Error("Failed to update Funding Source.")
-                    )
-                )
-            );
-    }
-
-    deleteRetirementGoal(id: number): Observable<void> {
-         const token = this.authService.getToken();
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`
-        });
-        return this.http.delete<void>(this.URL + `/${id}`, { headers })
-            .pipe(
-                catchError(
-                    () => throwError(
-                        () => new Error("Failed to delete Funding Source.")
-                    )
-                )
-            );
-    }
+    
+      updateRetirementGoal(id: number, retirementGoal: RetirementGoal): Observable<RetirementGoal> {
+        return this.http.put<RetirementGoal>(`${this.URL}/${id}`, retirementGoal, this.getHttpOptions())
+          .pipe(
+            catchError(() => throwError(() => new Error("Failed to update Retirement Goal.")))
+          );
+      }
+    
+      deleteRetirementGoal(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.URL}/${id}`, this.getHttpOptions())
+          .pipe(
+            catchError(() => throwError(() => new Error("Failed to delete Retirement Goal.")))
+          );
+      }
 
 }

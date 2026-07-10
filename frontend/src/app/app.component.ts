@@ -20,7 +20,10 @@ export class AppComponent {
   constructor(private router: Router) {}
 
    navItems: MenuItem[] = [
-    {label: "Funding Sources", command: () => this.router.navigate(["/funding-sources"])}
+    {label: "Funding Sources", command: () => this.router.navigate(["/funding-sources"])},
+    {label: "Retirement Goals", command: () => this.router.navigate(["/retirement-goals"])},
+    
+
   ]
 
    onProfileClick(): void {

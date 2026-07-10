@@ -151,7 +151,7 @@ export class RetirementGoalsComponent implements OnInit {
       });
     } else {
       const id = this.selectedRetirementGoal()!.id!;
-      this.retirementGoalService.udpateRetirementGoal(id, payload).subscribe({
+      this.retirementGoalService.updateRetirementGoal(id, payload).subscribe({
         next: (data) => {
           this.retirementGoals.update((currentList) =>
             currentList.map(goal => goal.id === data.id ? data : goal)
