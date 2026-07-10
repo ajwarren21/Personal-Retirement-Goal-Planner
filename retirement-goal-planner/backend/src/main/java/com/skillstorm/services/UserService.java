@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.skillstorm.dtos.UserDto;
+import com.skillstorm.dtos.UpdateUserDto;
+import com.skillstorm.dtos.ResponseUserDto;
 import com.skillstorm.models.Role;
 import com.skillstorm.models.User;
 import com.skillstorm.repositories.RoleRepository;
@@ -101,5 +103,22 @@ public class UserService implements UserDetailsService {
         .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
+    @Transactional
+    public ResponseUserDto updateUser(String currentUsername, UpdateUserDto updateRequest) {
+
+        User user = userRepository.findByUsername(currentUsername)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + currentUsername));
+
+        boolean usernameChanging = !user.getUsername().equals(updateRequest.username());
+        if (usernameChanging && userRepository.existsByUsername(updateRequest.username())) {
+            return null;
+        }
+
+        user.setUsername(updateRequest.username());
+        user.setEmail(updateRequest.email());
+        userRepository.save(user);
+
+        return new ResponseUserDto(user.getId(), user.getUsername(), user.getEmail());
+    }
 
 }

@@ -4,7 +4,7 @@ import { catchError, Observable, tap, throwError } from "rxjs";
 import { LoginRequest } from '../types/login-request';
 import { environment } from '../../environments/environments';
 import { Router } from '@angular/router';
-import {User} from '../types/user';
+import { User } from '../types/user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -63,9 +63,38 @@ export class AuthService {
     );
   }
 
-  getUser(): any | null {
+  getUser(): User | null {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
+  }
+
+  updateUser(payload: Pick<User, 'username' | 'email'>): Observable<User> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': token ?? ''
+    });
+
+    return this.http.put<User>(`${this.URL}api/auth/user`, payload, {
+      headers,
+      withCredentials: true
+    })
+    .pipe(
+      tap(updatedUser => {
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+
+        
+        if (token) {
+          const decoded = atob(token.replace('Basic ', ''));
+          const password = decoded.substring(decoded.indexOf(':') + 1);
+          const newToken = 'Basic ' + btoa(`${updatedUser.username}:${password}`);
+          localStorage.setItem('token', newToken);
+        }
+      }),
+      catchError(error => {
+        console.error('Update user error:', error);
+        return throwError(() => new Error('Unable to save profile changes.'));
+      })
+    );
   }
 
   isLoggedIn(): boolean {

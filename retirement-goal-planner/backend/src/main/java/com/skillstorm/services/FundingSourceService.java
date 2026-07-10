@@ -1,6 +1,5 @@
 package com.skillstorm.services;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.skillstorm.dtos.FundingSourceDto;
@@ -10,7 +9,6 @@ import com.skillstorm.mappers.FundingSourceMapper;
 import com.skillstorm.models.FundingSource;
 import com.skillstorm.models.User;
 import com.skillstorm.repositories.FundingSourceRepository;
-// import com.skillstorm.repositories.UserRepository;
 import com.skillstorm.repositories.UserRepository;
 
 @Service

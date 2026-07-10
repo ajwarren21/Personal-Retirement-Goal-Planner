@@ -9,7 +9,7 @@
         <p-skeleton width="9rem" height="1.25rem" styleClass="name-skeleton" />
       } @else {
         <p-avatar [label]="initials" size="xlarge" shape="circle" styleClass="profile-avatar" />
-        <h1 class="profile-name">{{ user?.name || 'Loading...' }}</h1>
+        <h1 class="profile-name">{{ user?.username || 'Loading...' }}</h1>
         @if (user) {
           <p-tag value="Verified member" severity="success" styleClass="verified-tag" />
         }
@@ -34,8 +34,8 @@
             <div class="credential-row">
               <i class="pi pi-user credential-icon"></i>
               <div class="credential-text">
-                <span class="credential-label">Full name</span>
-                <span class="credential-value">{{ user.name }}</span>
+                <span class="credential-label">Username</span>
+                <span class="credential-value">{{ user.username }}</span>
               </div>
             </div>
 
@@ -58,12 +58,12 @@
           <form class="credential-form" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
 
             <div class="form-field">
-              <span class="form-label">Full name</span>
+              <span class="form-label">Username</span>
               <p-iconfield>
                 <p-inputicon class="pi pi-user" />
-                <input pInputText formControlName="name" placeholder="Full name" class="w-full" />
+                <input pInputText formControlName="username" placeholder="Username" class="w-full" />
               </p-iconfield>
-              @if (profileForm.get('name')?.invalid && profileForm.get('name')?.touched) {
+              @if (profileForm.get('username')?.invalid && profileForm.get('username')?.touched) {
                 <small class="field-error">Enter at least 2 characters.</small>
               }
             </div>
