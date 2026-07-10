@@ -20,6 +20,7 @@ export class AppComponent {
   constructor(private router: Router) {}
 
    navItems: MenuItem[] = [
+    {label: "Dashboard", command: () => this.router.navigate(["/dashboard"])},
     {label: "Funding Sources", command: () => this.router.navigate(["/funding-sources"])},
     {label: "Retirement Goals", command: () => this.router.navigate(["/retirement-goals"])},
     

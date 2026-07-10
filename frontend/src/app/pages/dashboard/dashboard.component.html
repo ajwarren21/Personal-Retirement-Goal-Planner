@@ -1,0 +1,111 @@
+<div class="dashboard">
+
+    <h1>Retirement Dashboard</h1>
+
+    <div class="summary-grid">
+
+        <p-card>
+
+            <h3>Goals</h3>
+
+            <h1>{{goalCount}}</h1>
+
+        </p-card>
+
+        <p-card>
+
+            <h3>Funding Sources</h3>
+
+            <h1>{{fundingSourceCount}}</h1>
+
+        </p-card>
+
+        <p-card>
+
+            <h3>Total Target</h3>
+
+            <h2>{{totalTargetAmount | currency}}</h2>
+
+        </p-card>
+
+        <p-card>
+
+            <h3>Total Contributed</h3>
+
+            <h2>{{totalContributed | currency}}</h2>
+
+        </p-card>
+
+    </div>
+
+    <div class="section">
+
+        <h2>Retirement Goals</h2>
+
+        <p-card
+            *ngFor="let goal of goals"
+            class="list-card">
+
+            <div class="row">
+
+                <div>
+
+                    <h3>{{goal.name}}</h3>
+
+                    <p>
+                        Retirement Age:
+                        {{goal.targetRetirementAge}}
+                    </p>
+
+                    <p>
+                        Target:
+                        {{goal.targetAmount | currency}}
+                    </p>
+
+                </div>
+
+                <button
+                    pButton
+                    label="View"
+                    [routerLink]="['/retirement-goals']">
+                </button>
+
+            </div>
+
+        </p-card>
+
+    </div>
+
+    <div class="section">
+
+        <h2>Funding Sources</h2>
+
+        <p-card
+            *ngFor="let source of fundingSources"
+            class="list-card">
+
+            <div class="row">
+
+                <div>
+
+                    <h3>{{source.name}}</h3>
+
+                    <p>{{source.institution}}</p>
+
+                    <p>{{source.sourceType}}</p>
+
+                </div>
+
+                <button
+                    pButton
+                    label="View"
+                    [routerLink]="['/funding-sources']">
+                </button>
+
+            </div>
+
+        </p-card>
+
+    </div>
+
+</div>
