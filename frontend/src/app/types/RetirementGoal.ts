@@ -4,6 +4,6 @@ export interface RetirementGoal {
   name: string;
   targetRetirementAge: number;
   targetAmount: number;
-//   contributions: Array<Contribution>;
+  contributions: Array<Contribution>;
   notes: string;
 }

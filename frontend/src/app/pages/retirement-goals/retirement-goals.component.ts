@@ -10,9 +10,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { IftaLabelModule } from 'primeng/iftalabel';
-import { RetirementGoalService } from '../../services/retirement-goal.service';
-import { RetirementGoal } from '../../types/RetirementGoal';
 import { InputNumberModule } from 'primeng/inputnumber';
+
+import { RetirementGoalService } from '../../services/retirement-goal.service';
+import { ContributionService } from '../../services/contribution.service';
+import { FundingSourceService } from '../../services/FundingSourceService'; 
+import { RetirementGoal } from '../../types/RetirementGoal';
+import { Contribution, ContributionRequest, ContributionCategory } from '../../types/Contribution';
+import { FundingSource } from '../../types/FundingSource';
 
 @Component({
   selector: 'app-retirement-goals',
@@ -37,32 +42,40 @@ import { InputNumberModule } from 'primeng/inputnumber';
 export class RetirementGoalsComponent implements OnInit {
 
   private readonly retirementGoalService = inject(RetirementGoalService);
+  private readonly contributionService = inject(ContributionService);
+  private readonly fundingSourceService = inject(FundingSourceService);
 
-  // Angular signals for reactive state
+  // ---- Goal state ----
   retirementGoals = signal<RetirementGoal[]>([]);
-  selectedRetirementGoal = signal<RetirementGoal | null>(null);  // source being updated/deleted
-  showDialog = signal<boolean>(false);                          // form dialog toggle
-  showDeleteDialog = signal<boolean>(false);                    // delete confirmation toggle
+  selectedRetirementGoal = signal<RetirementGoal | null>(null);
+  showDialog = signal<boolean>(false);
+  showDeleteDialog = signal<boolean>(false);
   dialogTitle = signal<string>("");
 
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
 
-//   sourceTypeOptions = [
-//   { label: 'Traditional 401(k)', value: 'TRADITIONAL_401K' },
-//   { label: 'Roth 401(k)', value: 'ROTH_401K' },
-//   { label: 'Traditional IRA', value: 'TRADITIONAL_IRA' },
-//   { label: 'Roth IRA', value: 'ROTH_IRA' },
-//   { label: 'SEP IRA', value: 'SEP_IRA' },
-//   { label: 'Taxable Brokerage', value: 'TAXABLE_BROKERAGE' }
-// ];
-
   form!: FormGroup;
+
+  // ---- Contribution state ----
+  fundingSources = signal<FundingSource[]>([]);
+  showContributionDialog = signal<boolean>(false);
+  contributionForm!: FormGroup;
+  contributionGoal = signal<RetirementGoal | null>(null); // which goal we're adding a contribution to
+  selectedContribution = signal<Contribution | null>(null); // set when editing, null when creating
+
+  categoryOptions = [
+    { label: 'Employer Match', value: ContributionCategory.EMPLOYER_MATCH },
+    { label: 'Employee Contribution', value: ContributionCategory.EMPLOYER_SALARY_DEFERRAL },
+    { label: 'Catch-Up', value: ContributionCategory.CATCH_UP_CONTRIBUTION },
+    { label: 'Rollover', value: ContributionCategory.ROLLOVER }
+  ];
 
   constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
     this.loadRetirementGoals();
+    this.loadFundingSources();
 
     this.form = this.formBuilder.group({
       name: ["", [Validators.required, Validators.minLength(2)]],
@@ -70,7 +83,21 @@ export class RetirementGoalsComponent implements OnInit {
       targetAmount: [0, [Validators.required]],
       notes: [""]
     });
+
+    this.contributionForm = this.formBuilder.group({
+      fundingSourceId: [null, [Validators.required]],
+      amount: [0, [Validators.required, Validators.min(0.01)]],
+      contributionDate: [this.today(), [Validators.required]],
+      category: [null, [Validators.required]],
+      notes: [""]
+    });
   }
+
+  private today(): string {
+    return new Date().toISOString().substring(0, 10);
+  }
+
+  // ---- Goal CRUD  ----
 
   loadRetirementGoals(): void {
     this.loading.set(true);
@@ -89,8 +116,14 @@ export class RetirementGoalsComponent implements OnInit {
     });
   }
 
-  saveRetirementGoal(): void {
+  loadFundingSources(): void {
+    this.fundingSourceService.getFundingSources().subscribe({
+      next: (data) => this.fundingSources.set(data),
+      error: (err) => console.error('Failed to load funding sources', err)
+    });
+  }
 
+  saveRetirementGoal(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -98,17 +131,14 @@ export class RetirementGoalsComponent implements OnInit {
 
     const { name, targetRetirementAge, targetAmount, notes } = this.form.value;
 
-
     const payload: RetirementGoal = {
       name,
       targetRetirementAge,
       targetAmount,
-      // contributions: [],
       notes
     };
 
     if (this.selectedRetirementGoal() === null) {
-      // CREATE
       this.retirementGoalService.createRetirementGoal(payload).subscribe({
         next: (data) => {
           this.retirementGoals.update((currentList) => [...currentList, data]);
@@ -120,12 +150,11 @@ export class RetirementGoalsComponent implements OnInit {
         }
       });
     } else {
-      // UPDATE
       const id = this.selectedRetirementGoal()!.id!;
       this.retirementGoalService.udpateRetirementGoal(id, payload).subscribe({
         next: (data) => {
           this.retirementGoals.update((currentList) =>
-            currentList.map(source => source.id === data.id ? data : source)
+            currentList.map(goal => goal.id === data.id ? data : goal)
           );
           this.showDialog.set(false);
         },
@@ -145,31 +174,28 @@ export class RetirementGoalsComponent implements OnInit {
       name: "",
       targetRetirementAge: 0,
       targetAmount: 0,
-      // contributions: [],
       notes: ""
     });
 
     this.showDialog.set(true);
   }
 
-  handleUpdateRetirementGoal(source: RetirementGoal): void {
-    this.dialogTitle.set("Update Funding Source");
-    this.selectedRetirementGoal.set(source);
+  handleUpdateRetirementGoal(goal: RetirementGoal): void {
+    this.dialogTitle.set("Update Retirement Goal");
+    this.selectedRetirementGoal.set(goal);
 
     this.form.setValue({
-      name: source.name,
-      targetRetirementAge: source.targetRetirementAge,
-      targetAmount: source.targetAmount,
-      // contributions: this.selectedRetirementGoal()?.contributions ?? [],
-      // The contributions field might could be ignored by backend and handled in the backend service instead
-      notes: source.notes
+      name: goal.name,
+      targetRetirementAge: goal.targetRetirementAge,
+      targetAmount: goal.targetAmount,
+      notes: goal.notes
     });
 
     this.showDialog.set(true);
   }
 
-  handleDeleteRetirementGoal(source: RetirementGoal): void {
-    this.selectedRetirementGoal.set(source);
+  handleDeleteRetirementGoal(goal: RetirementGoal): void {
+    this.selectedRetirementGoal.set(goal);
     this.showDeleteDialog.set(true);
   }
 
@@ -179,7 +205,7 @@ export class RetirementGoalsComponent implements OnInit {
     this.retirementGoalService.deleteRetirementGoal(id).subscribe({
       next: () => {
         this.retirementGoals.update((currentList) =>
-          currentList.filter(source => source.id !== id)
+          currentList.filter(goal => goal.id !== id)
         );
         this.showDeleteDialog.set(false);
       },
@@ -187,6 +213,90 @@ export class RetirementGoalsComponent implements OnInit {
         console.error(err);
         this.showDeleteDialog.set(false);
       }
+    });
+  }
+
+  // ---- Contribution CRUD, scoped to a specific goal ----
+
+  totalContributed(goal: RetirementGoal): number {
+    return (goal.contributions ?? []).reduce((sum, c) => sum + c.amount, 0);
+  }
+
+  handleAddContribution(goal: RetirementGoal): void {
+    this.contributionGoal.set(goal);
+    this.selectedContribution.set(null);
+
+    this.contributionForm.setValue({
+      fundingSourceId: null,
+      amount: 0,
+      contributionDate: this.today(),
+      category: null,
+      notes: ""
+    });
+
+    this.showContributionDialog.set(true);
+  }
+
+  handleEditContribution(goal: RetirementGoal, contribution: Contribution): void {
+    this.contributionGoal.set(goal);
+    this.selectedContribution.set(contribution);
+
+    this.contributionForm.setValue({
+      fundingSourceId: contribution.fundingSource.id,
+      amount: contribution.amount,
+      contributionDate: contribution.contributionDate,
+      category: contribution.category,
+      notes: contribution.notes ?? ""
+    });
+
+    this.showContributionDialog.set(true);
+  }
+
+  saveContribution(): void {
+    if (this.contributionForm.invalid) {
+      this.contributionForm.markAllAsTouched();
+      return;
+    }
+
+    const goal = this.contributionGoal();
+    if (!goal?.id) {
+      return;
+    }
+
+    const { fundingSourceId, amount, contributionDate, category, notes } = this.contributionForm.value;
+
+    const payload: ContributionRequest = {
+      retirementGoalId: goal.id,
+      fundingSourceId,
+      amount,
+      contributionDate,
+      category,
+      notes
+    };
+
+    const existing = this.selectedContribution();
+
+    const request$ = existing
+      ? this.contributionService.update(existing.id, payload)
+      : this.contributionService.create(payload);
+
+    request$.subscribe({
+      next: () => {
+        this.showContributionDialog.set(false);
+        // Simplest correct option: re-fetch goals so the embedded
+        // contributions list stays in sync with the backend.
+        this.loadRetirementGoals();
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+
+  deleteContribution(contribution: Contribution): void {
+    this.contributionService.delete(contribution.id).subscribe({
+      next: () => this.loadRetirementGoals(),
+      error: (err) => console.error(err)
     });
   }
 }
