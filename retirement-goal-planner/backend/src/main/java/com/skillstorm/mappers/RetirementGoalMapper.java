@@ -28,7 +28,7 @@ public interface RetirementGoalMapper {
      * @param entity entity to map
      * @return ResponseRetirementGoalDto
      */
-    @Mapping(target = "id", ignore = true)
+    // @Mapping(target = "id", ignore = true)
     ResponseRetirementGoalDto toDto(RetirementGoal entity);
 
     /**
