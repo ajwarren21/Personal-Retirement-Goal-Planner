@@ -35,16 +35,17 @@ public class FundingSourceService {
         return mapper.toDto(repo.findById(id).orElseThrow(() -> new SourceNotFoundException(id)));
     }
 
-    public FundingSource createSourceForUser(FundingSource source, String username) {
+    public ResponseFundingSourceDto createSourceForUser(FundingSourceDto sourceDto, String username) {
         // Find the user object in the DB
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("User not found"));
         
+        FundingSource source = mapper.toEntity(sourceDto);
         // Link the funding source to this specific user profile
         source.setUser(user);
         
         // Persist to database
-        return repo.save(source);
+        return mapper.toDto(repo.save(source));
     }
 
 

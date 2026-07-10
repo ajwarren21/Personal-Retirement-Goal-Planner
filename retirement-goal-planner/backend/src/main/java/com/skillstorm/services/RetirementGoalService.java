@@ -9,31 +9,54 @@ import com.skillstorm.dtos.RetirementGoalDto;
 import com.skillstorm.exceptions.GoalNotFoundException;
 import com.skillstorm.mappers.RetirementGoalMapper;
 import com.skillstorm.models.RetirementGoal;
+import com.skillstorm.models.User;
 import com.skillstorm.repositories.RetirementGoalRepository;
+import com.skillstorm.repositories.UserRepository;
 
 @Service
 public class RetirementGoalService {
     
     private final RetirementGoalRepository repo;
     private final RetirementGoalMapper mapper;
+    private final UserRepository userRepository;
 
-    public RetirementGoalService(RetirementGoalRepository repo, RetirementGoalMapper mapper) {
+    public RetirementGoalService(RetirementGoalRepository repo, RetirementGoalMapper mapper, UserRepository userRepository) {
         this.repo = repo;
         this.mapper = mapper;
+        this.userRepository = userRepository;
     }
 
-    public Iterable<ResponseRetirementGoalDto> getAll() {
-        return repo.findAll().stream().map(mapper::toDto).toList();
+    public Iterable<ResponseRetirementGoalDto> getGoalsByUser(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        return repo.findByUserId(user.getId()).stream().map(mapper::toDto).toList();
     }
+
+    // public Iterable<ResponseRetirementGoalDto> getAll() {
+    //     return repo.findAll().stream().map(mapper::toDto).toList();
+    // }
 
     public ResponseRetirementGoalDto getById(long id) {
         RetirementGoal r = repo.findById(id).orElseThrow(() -> new GoalNotFoundException(id));
         return mapper.toDto(r);
     }
 
-    public ResponseRetirementGoalDto create(RetirementGoalDto dto) {
-        return mapper.toDto(repo.save(mapper.toEntity(dto)));
+
+    public ResponseRetirementGoalDto createGoalForUser(RetirementGoalDto goalDto, String username) {
+        // Find the user object in the DB
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        RetirementGoal goal = mapper.toEntity(goalDto);
+        // Link the funding source to this specific user profile
+        goal.setUser(user);
+        
+        // Persist to database
+        return mapper.toDto(repo.save(goal));
     }
+
+    // public ResponseRetirementGoalDto create(RetirementGoalDto dto) {
+    //     return mapper.toDto(repo.save(mapper.toEntity(dto)));
+    // }
 
     public ResponseRetirementGoalDto update(long id, RetirementGoalDto dto) {
         RetirementGoal r = repo.findById(id).orElseThrow(() -> new GoalNotFoundException(id));
