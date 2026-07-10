@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { RetirementGoal } from '../types/RetirementGoal';
+import { RetirementGoal, RetirementGoalRequest } from '../types/RetirementGoal';
 import { catchError, Observable, throwError } from "rxjs";
 import { environment } from "../../environments/environments";
 import { AuthService } from "./auth.service";
@@ -35,7 +35,7 @@ export class RetirementGoalService {
           );
       }
     
-      createRetirementGoal(retirementGoal: RetirementGoal): Observable<RetirementGoal> {
+      createRetirementGoal(retirementGoal: RetirementGoalRequest): Observable<RetirementGoal> {
       return this.http.post<RetirementGoal>(this.URL, retirementGoal, this.getHttpOptions())
         .pipe(
           catchError((error) => {
@@ -45,7 +45,7 @@ export class RetirementGoalService {
         );
     }
     
-      updateRetirementGoal(id: number, retirementGoal: RetirementGoal): Observable<RetirementGoal> {
+      updateRetirementGoal(id: number, retirementGoal: RetirementGoalRequest): Observable<RetirementGoal> {
         return this.http.put<RetirementGoal>(`${this.URL}/${id}`, retirementGoal, this.getHttpOptions())
           .pipe(
             catchError(() => throwError(() => new Error("Failed to update Retirement Goal.")))

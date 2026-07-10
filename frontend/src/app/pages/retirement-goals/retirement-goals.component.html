@@ -33,6 +33,7 @@
   @if (!loading() && !error()) {
     <p-table
       [value]="retirementGoals()"
+      dataKey="id"
       [paginator]="true"
       [rows]="10"
       [rowsPerPageOptions]="[5, 10, 25]"
@@ -41,6 +42,7 @@
 
       <ng-template pTemplate="header">
         <tr>
+          <th style="width: 3rem"></th>
           <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
           <th pSortableColumn="targetRetirementAge">Target Retirement Age <p-sortIcon field="targetRetirementAge" /></th>
           <th pSortableColumn="targetAmount">Target Amount <p-sortIcon field="targetAmount" /></th>
@@ -49,25 +51,104 @@
         </tr>
       </ng-template>
 
-      <ng-template pTemplate="body" let-source>
+      <ng-template pTemplate="body" let-goal let-expanded="expanded">
         <tr>
-          <td class="font-medium">{{ source.name }}</td>
-          <td>{{ source.institution }}</td>
-          <td class="text-gray-500 text-sm">{{ source.notes || '—' }}</td>
+          <td>
+            <button
+              type="button"
+              pButton
+              [pRowToggler]="goal"
+              class="p-button-text p-button-sm p-button-rounded"
+              [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'">
+            </button>
+          </td>
+          <td class="font-medium">{{ goal.name }}</td>
+          <td>{{ goal.targetRetirementAge }}</td>
+          <td>{{ goal.targetAmount | currency }}</td>
+          <td class="text-gray-500 text-sm">{{ goal.notes || '—' }}</td>
           <td>
             <div class="flex gap-2">
               <button
                 pButton
                 icon="pi pi-pencil"
                 class="p-button-sm p-button-text p-button-secondary"
-                (click)="handleUpdateRetirementGoal(source)">
+                (click)="handleUpdateRetirementGoal(goal)">
               </button>
               <button
                 pButton
                 icon="pi pi-trash"
                 class="p-button-sm p-button-text p-button-danger"
-                (click)="handleDeleteRetirementGoal(source)">
+                (click)="handleDeleteRetirementGoal(goal)">
               </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Expanded row: contributions for this goal -->
+      <ng-template pTemplate="rowexpansion" let-goal>
+        <tr>
+          <td colspan="6">
+            <div class="p-4 bg-gray-50 rounded">
+
+              <div class="flex items-center justify-between mb-3">
+                <div class="text-sm text-gray-600">
+                  <strong>{{ totalContributed(goal) | currency }}</strong> contributed
+                  of {{ goal.targetAmount | currency }} target
+                </div>
+                <button
+                  pButton
+                  label="Add Contribution"
+                  icon="pi pi-plus"
+                  class="p-button-sm p-button-outlined"
+                  (click)="handleAddContribution(goal)">
+                </button>
+              </div>
+
+              @if (goal.contributions && goal.contributions.length > 0) {
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="text-left text-gray-500 border-b">
+                      <th class="py-1">Funding Source</th>
+                      <th class="py-1">Amount</th>
+                      <th class="py-1">Date</th>
+                      <th class="py-1">Category</th>
+                      <th class="py-1">Notes</th>
+                      <th class="py-1"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (contribution of goal.contributions; track contribution.id) {
+                      <tr class="border-b last:border-0">
+                        <td class="py-1">{{ contribution.fundingSource?.name }}</td>
+                        <td class="py-1">{{ contribution.amount | currency }}</td>
+                        <td class="py-1">{{ contribution.contributionDate }}</td>
+                        <td class="py-1">{{ contribution.category }}</td>
+                        <td class="py-1 text-gray-500">{{ contribution.notes || '—' }}</td>
+                        <td class="py-1">
+                          <div class="flex gap-1">
+                            <button
+                              pButton
+                              icon="pi pi-pencil"
+                              class="p-button-sm p-button-text p-button-secondary"
+                              (click)="handleEditContribution(goal, contribution)">
+                            </button>
+                            <button
+                              pButton
+                              icon="pi pi-trash"
+                              class="p-button-sm p-button-text p-button-danger"
+                              (click)="deleteContribution(contribution)">
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              } @else {
+                <p class="text-gray-400 text-sm italic">No contributions yet for this goal.</p>
+              }
+
             </div>
           </td>
         </tr>
@@ -75,7 +156,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5" class="text-center text-gray-500 py-8">
+          <td colspan="6" class="text-center text-gray-500 py-8">
             No Retirement Goals found. Add one to get started.
           </td>
         </tr>
@@ -84,7 +165,7 @@
     </p-table>
   }
 
-  <!-- Create / Update Dialog — single dialog reused for both -->
+  <!-- Create / Update Goal Dialog -->
   <p-dialog
     [header]="dialogTitle()"
     [(visible)]="showDialog"
@@ -103,45 +184,32 @@
       }
 
       <div class="flex flex-col gap-1">
-        <label for="targetRetirementAge" class="font-medium">
-            Target Retirement Age
-        </label>
-
-            <p-inputNumber
-                inputId="targetRetirementAge"
-                formControlName="targetRetirementAge"
-                [useGrouping]="false"
-                styleClass="w-full">
-            </p-inputNumber>
-            @if (form.get('targetRetirementAge')?.invalid &&
-                form.get('targetRetirementAge')?.touched) {
-                <small class="text-red-500">
-                    Age is required
-                </small>
-                }
-            </div>
+        <label for="targetRetirementAge" class="font-medium">Target Retirement Age</label>
+        <p-inputNumber
+          inputId="targetRetirementAge"
+          formControlName="targetRetirementAge"
+          [useGrouping]="false"
+          styleClass="w-full">
+        </p-inputNumber>
+        @if (form.get('targetRetirementAge')?.invalid && form.get('targetRetirementAge')?.touched) {
+          <small class="text-red-500">Age is required</small>
+        }
+      </div>
 
       <div class="flex flex-col gap-1">
-        <label for="targetAmount" class="font-medium">
-            Target Amount
-        </label>
-
-            <p-inputNumber
-                inputId="targetAmount"
-                formControlName="targetAmount"
-                mode="currency"
-                currency="USD"
-                locale="en-US"
-                styleClass="w-full">
-            </p-inputNumber>
-
-            @if (form.get('targetAmount')?.invalid &&
-                form.get('targetAmount')?.touched) {
-                <small class="text-red-500">
-                    Amount is required
-                </small>
-                }
-            </div>
+        <label for="targetAmount" class="font-medium">Target Amount</label>
+        <p-inputNumber
+          inputId="targetAmount"
+          formControlName="targetAmount"
+          mode="currency"
+          currency="USD"
+          locale="en-US"
+          styleClass="w-full">
+        </p-inputNumber>
+        @if (form.get('targetAmount')?.invalid && form.get('targetAmount')?.touched) {
+          <small class="text-red-500">Amount is required</small>
+        }
+      </div>
 
       <p-iftalabel>
         <textarea pTextarea id="notes" formControlName="notes" rows="3" class="w-full"></textarea>
@@ -149,27 +217,15 @@
       </p-iftalabel>
 
       <div class="flex justify-end gap-2 pt-2">
-        <button
-          pButton
-          type="button"
-          label="Cancel"
-          class="p-button-text p-button-sm"
-          (click)="showDialog.set(false)">
-        </button>
-        <button
-          pButton
-          type="submit"
-          label="Save"
-          icon="pi pi-check"
-          class="p-button-sm">
-        </button>
+        <button pButton type="button" label="Cancel" class="p-button-text p-button-sm" (click)="showDialog.set(false)"></button>
+        <button pButton type="submit" label="Save" icon="pi pi-check" class="p-button-sm"></button>
       </div>
 
     </form>
 
   </p-dialog>
 
-  <!-- Delete Confirmation Dialog -->
+  <!-- Delete Goal Confirmation Dialog -->
   <p-dialog
     header="Confirm Delete"
     [(visible)]="showDeleteDialog"
@@ -184,22 +240,94 @@
     </p>
 
     <div class="flex justify-end gap-2 pt-4">
-      <button
-        pButton
-        label="Cancel"
-        class="p-button-text p-button-sm"
-        (click)="showDeleteDialog.set(false)">
-      </button>
-      <button
-        pButton
-        label="Delete"
-        icon="pi pi-trash"
-        class="p-button-sm p-button-danger"
-        (click)="deleteRetirementGoal()">
-      </button>
+      <button pButton label="Cancel" class="p-button-text p-button-sm" (click)="showDeleteDialog.set(false)"></button>
+      <button pButton label="Delete" icon="pi pi-trash" class="p-button-sm p-button-danger" (click)="deleteRetirementGoal()"></button>
     </div>
 
   </p-dialog>
 
-</div>
+  <!-- Add / Edit Contribution Dialog -->
+  <p-dialog
+    [header]="selectedContribution() ? 'Update Contribution' : 'Add Contribution'"
+    [(visible)]="showContributionDialog"
+    [modal]="true"
+    [style]="{ width: '28rem' }"
+    [draggable]="false">
 
+    <form [formGroup]="contributionForm" (ngSubmit)="saveContribution()" class="flex flex-col gap-4 pt-2">
+
+      <div class="flex flex-col gap-1">
+        <label for="fundingSourceId" class="font-medium">Funding Source</label>
+        <p-select
+          inputId="fundingSourceId"
+          formControlName="fundingSourceId"
+          [options]="fundingSources()"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select a funding source"
+          styleClass="w-full">
+        </p-select>
+        @if (contributionForm.get('fundingSourceId')?.invalid && contributionForm.get('fundingSourceId')?.touched) {
+          <small class="text-red-500">Funding source is required</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="amount" class="font-medium">Amount</label>
+        <p-inputNumber
+          inputId="amount"
+          formControlName="amount"
+          mode="currency"
+          currency="USD"
+          locale="en-US"
+          styleClass="w-full">
+        </p-inputNumber>
+        @if (contributionForm.get('amount')?.invalid && contributionForm.get('amount')?.touched) {
+          <small class="text-red-500">Amount must be greater than zero</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="contributionDate" class="font-medium">Contribution Date</label>
+        <input
+          pInputText
+          type="date"
+          id="contributionDate"
+          formControlName="contributionDate"
+          class="w-full" />
+        @if (contributionForm.get('contributionDate')?.invalid && contributionForm.get('contributionDate')?.touched) {
+          <small class="text-red-500">Date is required</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="category" class="font-medium">Category</label>
+        <p-select
+          inputId="category"
+          formControlName="category"
+          [options]="categoryOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select a category"
+          styleClass="w-full">
+        </p-select>
+        @if (contributionForm.get('category')?.invalid && contributionForm.get('category')?.touched) {
+          <small class="text-red-500">Category is required</small>
+        }
+      </div>
+
+      <p-iftalabel>
+        <textarea pTextarea id="contributionNotes" formControlName="notes" rows="2" class="w-full"></textarea>
+        <label for="contributionNotes">Notes</label>
+      </p-iftalabel>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button pButton type="button" label="Cancel" class="p-button-text p-button-sm" (click)="showContributionDialog.set(false)"></button>
+        <button pButton type="submit" label="Save" icon="pi pi-check" class="p-button-sm"></button>
+      </div>
+
+    </form>
+
+  </p-dialog>
+
+</div>

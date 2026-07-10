@@ -16,6 +16,7 @@ import { RetirementGoalService } from '../../services/retirement-goal.service';
 import { ContributionService } from '../../services/contribution.service';
 import { FundingSourceService } from '../../services/FundingSourceService'; 
 import { RetirementGoal } from '../../types/RetirementGoal';
+import { RetirementGoalRequest } from '../../types/RetirementGoal';
 import { Contribution, ContributionRequest, ContributionCategory } from '../../types/Contribution';
 import { FundingSource } from '../../types/FundingSource';
 
@@ -54,6 +55,23 @@ export class RetirementGoalsComponent implements OnInit {
 
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
+
+  // expandedRowKeys = signal<Record<string, boolean>>({});
+  // remove: expandedRowKeys = signal<Record<string, boolean>>({});
+    expandedGoalIds = signal<Set<number>>(new Set());
+
+    toggleExpand(goal: RetirementGoal): void {
+      if (!goal.id) return;
+      this.expandedGoalIds.update(current => {
+        const next = new Set(current);
+        next.has(goal.id!) ? next.delete(goal.id!) : next.add(goal.id!);
+        return next;
+      });
+    }
+
+    isExpanded(goal: RetirementGoal): boolean {
+      return !!goal.id && this.expandedGoalIds().has(goal.id);
+    }
 
   form!: FormGroup;
 
@@ -97,7 +115,7 @@ export class RetirementGoalsComponent implements OnInit {
     return new Date().toISOString().substring(0, 10);
   }
 
-  // ---- Goal CRUD  ----
+  // ---- GOAL FUNCTIONS ----
 
   loadRetirementGoals(): void {
     this.loading.set(true);
@@ -131,7 +149,7 @@ export class RetirementGoalsComponent implements OnInit {
 
     const { name, targetRetirementAge, targetAmount, notes } = this.form.value;
 
-    const payload: RetirementGoal = {
+    const payload: RetirementGoalRequest = {
       name,
       targetRetirementAge,
       targetAmount,
