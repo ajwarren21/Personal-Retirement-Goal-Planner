@@ -295,8 +295,8 @@ export class RetirementGoalsComponent implements OnInit {
     const existing = this.selectedContribution();
 
     const request$ = existing
-      ? this.contributionService.update(existing.id, payload)
-      : this.contributionService.create(payload);
+      ? this.contributionService.updateContribution(existing.id, payload)
+      : this.contributionService.createContribution(payload);
 
     request$.subscribe({
       next: () => {
@@ -312,7 +312,7 @@ export class RetirementGoalsComponent implements OnInit {
   }
 
   deleteContribution(contribution: Contribution): void {
-    this.contributionService.delete(contribution.id).subscribe({
+    this.contributionService.deleteContribution(contribution.id).subscribe({
       next: () => this.loadRetirementGoals(),
       error: (err) => console.error(err)
     });
