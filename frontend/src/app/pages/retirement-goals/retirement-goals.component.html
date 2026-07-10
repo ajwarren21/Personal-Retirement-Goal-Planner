@@ -51,43 +51,31 @@
         </tr>
       </ng-template>
 
-      <ng-template pTemplate="body" let-goal let-expanded="expanded">
+      <ng-template pTemplate="body" let-goal>
         <tr>
-          <td>
+            <td>
             <button
-              type="button"
-              pButton
-              [pRowToggler]="goal"
-              class="p-button-text p-button-sm p-button-rounded"
-              [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'">
+                type="button"
+                pButton
+                class="p-button-text p-button-sm p-button-rounded"
+                [icon]="isExpanded(goal) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                (click)="toggleExpand(goal)">
             </button>
-          </td>
-          <td class="font-medium">{{ goal.name }}</td>
-          <td>{{ goal.targetRetirementAge }}</td>
-          <td>{{ goal.targetAmount | currency }}</td>
-          <td class="text-gray-500 text-sm">{{ goal.notes || '—' }}</td>
-          <td>
+            </td>
+            <td class="font-medium">{{ goal.name }}</td>
+            <td>{{ goal.targetRetirementAge }}</td>
+            <td>{{ goal.targetAmount | currency }}</td>
+            <td class="text-gray-500 text-sm">{{ goal.notes || '—' }}</td>
+            <td>
             <div class="flex gap-2">
-              <button
-                pButton
-                icon="pi pi-pencil"
-                class="p-button-sm p-button-text p-button-secondary"
-                (click)="handleUpdateRetirementGoal(goal)">
-              </button>
-              <button
-                pButton
-                icon="pi pi-trash"
-                class="p-button-sm p-button-text p-button-danger"
-                (click)="handleDeleteRetirementGoal(goal)">
-              </button>
+                <button pButton icon="pi pi-pencil" class="p-button-sm p-button-text p-button-secondary" (click)="handleUpdateRetirementGoal(goal)"></button>
+                <button pButton icon="pi pi-trash" class="p-button-sm p-button-text p-button-danger" (click)="handleDeleteRetirementGoal(goal)"></button>
             </div>
-          </td>
+            </td>
         </tr>
-      </ng-template>
 
-      <!-- Expanded row: contributions for this goal -->
-      <ng-template pTemplate="rowexpansion" let-goal>
-        <tr>
+        @if (isExpanded(goal)) {
+            <tr>
           <td colspan="6">
             <div class="p-4 bg-gray-50 rounded">
 
@@ -152,7 +140,11 @@
             </div>
           </td>
         </tr>
-      </ng-template>
+        }
+        </ng-template>
+
+      <!-- Expanded row: contributions for this goal -->
+      
 
       <ng-template pTemplate="emptymessage">
         <tr>

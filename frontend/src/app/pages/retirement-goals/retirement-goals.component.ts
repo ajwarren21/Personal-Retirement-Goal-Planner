@@ -57,16 +57,20 @@ export class RetirementGoalsComponent implements OnInit {
   error = signal<string | null>(null);
 
   // expandedRowKeys = signal<Record<string, boolean>>({});
-  // remove: expandedRowKeys = signal<Record<string, boolean>>({});
     expandedGoalIds = signal<Set<number>>(new Set());
 
     toggleExpand(goal: RetirementGoal): void {
-      if (!goal.id) return;
+      console.log('toggleExpand called for', goal.name, 'id:', goal.id);
+      if (!goal.id) {
+        console.warn('No id on this goal — cannot track expansion state');
+        return;
+      }
       this.expandedGoalIds.update(current => {
         const next = new Set(current);
         next.has(goal.id!) ? next.delete(goal.id!) : next.add(goal.id!);
         return next;
       });
+      console.log('expandedGoalIds now:', this.expandedGoalIds());
     }
 
     isExpanded(goal: RetirementGoal): boolean {

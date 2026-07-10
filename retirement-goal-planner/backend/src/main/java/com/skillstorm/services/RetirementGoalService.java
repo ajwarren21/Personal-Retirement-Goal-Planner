@@ -28,7 +28,11 @@ public class RetirementGoalService {
 
     public Iterable<ResponseRetirementGoalDto> getGoalsByUser(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-        return repo.findByUserId(user.getId()).stream().map(mapper::toDto).toList();
+
+        Iterable<ResponseRetirementGoalDto> temp = repo.findByUserId(user.getId()).stream().map(mapper::toDto).toList();
+        temp.forEach(goal -> System.out.println("Retirement Goal ID: " + goal.id())); 
+        return temp;
+        // return repo.findByUserId(user.getId()).stream().map(mapper::toDto).toList();
     }
 
     // public Iterable<ResponseRetirementGoalDto> getAll() {
