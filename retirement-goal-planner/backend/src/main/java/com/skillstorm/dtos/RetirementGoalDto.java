@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.skillstorm.models.Contribution;
-import com.skillstorm.models.User;
+// import com.skillstorm.models.User;
 
 
 
 public record RetirementGoalDto(
-    User user,
+    // User user,
     String name,
     Integer targetRetirementAge,
     BigDecimal targetAmount,

@@ -1,6 +1,8 @@
 package com.skillstorm.controllers;
 
 
+import java.security.Principal;
+
 import org.springframework.http.HttpStatus;
 // import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.skillstorm.dtos.FundingSourceDto;
+import com.skillstorm.dtos.ResponseFundingSourceDto;
 import com.skillstorm.dtos.ResponseRetirementGoalDto;
 import com.skillstorm.dtos.RetirementGoalDto;
 import com.skillstorm.services.RetirementGoalService;
@@ -39,8 +43,9 @@ public class RetirementGoalController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<ResponseRetirementGoalDto>> getAll() {
-        return ResponseEntity.ok(service.getAll());
+    public ResponseEntity<Iterable<ResponseRetirementGoalDto>> getUserRetirementGoals(Principal principal) {
+        Iterable<ResponseRetirementGoalDto> goals = service.getGoalsByUser(principal.getName());
+        return ResponseEntity.ok(goals);
     }
 
     @GetMapping("/{id}")
@@ -48,10 +53,19 @@ public class RetirementGoalController {
         return ResponseEntity.ok(service.getById(id));
     }
 
+    
     @PostMapping
-    public ResponseEntity<ResponseRetirementGoalDto> create(@Valid @RequestBody RetirementGoalDto dto) {
-        ResponseRetirementGoalDto created = service.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<ResponseRetirementGoalDto> createRetirementGoal(
+            @RequestBody RetirementGoalDto newGoal, 
+            Principal principal) {
+        
+        // 1. Extract the username/email of the logged-in user from the Principal
+        String username = principal.getName();
+        
+        // 2. Pass both the object data and the user identifier to your service layer
+        ResponseRetirementGoalDto savedGoal = service.createGoalForUser(newGoal, username);
+        
+        return new ResponseEntity<>(savedGoal, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

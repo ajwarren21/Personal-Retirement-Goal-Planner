@@ -19,9 +19,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 
 public record ContributionDto(
-    @NotNull(message = "User is required") User user,
+    // @NotNull(message = "User is required") User user,
 
-    @NotNull(message = "Retirement Goal is required") long RetirementGoalId,
+    @NotNull(message = "Retirement Goal is required") long retirementGoalId,
 
     @NotNull(message = "Funding Source is required") long fundingSourceId,
     

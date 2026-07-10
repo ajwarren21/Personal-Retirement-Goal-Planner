@@ -1,6 +1,8 @@
 package com.skillstorm.controllers;
 
 
+import java.security.Principal;
+
 import org.springframework.http.HttpStatus;
 // import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.skillstorm.dtos.ResponseContributionDto;
+import com.skillstorm.dtos.ResponseRetirementGoalDto;
+import com.skillstorm.dtos.RetirementGoalDto;
 import com.skillstorm.dtos.ContributionDto;
 import com.skillstorm.services.ContributionService;
 
@@ -40,8 +44,9 @@ public class ContributionController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<ResponseContributionDto>> getAll() {
-        return ResponseEntity.ok(service.getAll());
+    public ResponseEntity<Iterable<ResponseContributionDto>> getUserContributions(Principal principal) {
+        Iterable<ResponseContributionDto> conts = service.getContributionsByUser(principal.getName());
+        return ResponseEntity.ok(conts);
     }
 
     @GetMapping("/{id}")
@@ -50,9 +55,17 @@ public class ContributionController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseContributionDto> create(@Valid @RequestBody ContributionDto dto) {
-        ResponseContributionDto created = service.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<ResponseContributionDto> createContribution(
+            @RequestBody ContributionDto newCont, 
+            Principal principal) {
+        
+        // 1. Extract the username/email of the logged-in user from the Principal
+        String username = principal.getName();
+        
+        // 2. Pass both the object data and the user identifier to your service layer
+        ResponseContributionDto savedCont = service.createContributionForUser(newCont, username);
+        
+        return new ResponseEntity<>(savedCont, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

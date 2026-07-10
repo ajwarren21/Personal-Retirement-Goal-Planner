@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.skillstorm.models.Contribution;
-import com.skillstorm.models.User;
+// import com.skillstorm.models.User;
 
 // import jakarta.validation.constraints.DecimalMin;
 // import jakarta.validation.constraints.Min;
@@ -15,7 +15,7 @@ import com.skillstorm.models.User;
 
 public record ResponseRetirementGoalDto(
     long id,
-    User user,
+    // User user,
     String name,
     Integer targetRetirementAge,
     BigDecimal targetAmount,

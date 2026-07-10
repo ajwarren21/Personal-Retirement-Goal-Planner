@@ -10,12 +10,12 @@ import com.skillstorm.enums.ContributionCategory;
 // import com.skillstorm.models.Contribution;
 import com.skillstorm.models.FundingSource;
 import com.skillstorm.models.RetirementGoal;
-import com.skillstorm.models.User;
+// import com.skillstorm.models.User;
 
 
 public record ResponseContributionDto(
     long id,
-    User user,
+    // User user,
     RetirementGoal goal,
     FundingSource fundingSource,
     BigDecimal amount,

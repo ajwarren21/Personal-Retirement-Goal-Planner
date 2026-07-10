@@ -50,15 +50,15 @@ public class FundingSourceController {
 
 
     @PostMapping
-    public ResponseEntity<FundingSource> createFundingSource(
-            @RequestBody FundingSource newSource, 
+    public ResponseEntity<ResponseFundingSourceDto> createFundingSource(
+            @RequestBody FundingSourceDto newSource, 
             Principal principal) {
         
         // 1. Extract the username/email of the logged-in user from the Principal
         String username = principal.getName();
         
         // 2. Pass both the object data and the user identifier to your service layer
-        FundingSource savedSource = service.createSourceForUser(newSource, username);
+        ResponseFundingSourceDto savedSource = service.createSourceForUser(newSource, username);
         
         return new ResponseEntity<>(savedSource, HttpStatus.CREATED);
     }
