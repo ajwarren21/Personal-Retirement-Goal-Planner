@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.skillstorm</groupId>
     <artifactId>retirement-goal-planner</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>retirement-goal-planner</name>
     <description/>
     <url/>

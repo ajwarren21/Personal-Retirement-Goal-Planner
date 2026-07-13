@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/contributions")
-@CrossOrigin(origins = {"d3p6jm11yfu3uu.cloudfront.net", "http://localhost:4200", "http://localhost:5500", "http://127.0.0.1:5500"})
+@CrossOrigin(origins = {"https://d1dpzej41c5vns.cloudfront.net", "https://d3p6jm11yfu3uu.cloudfront.net", "http://localhost:4200", "http://localhost:5500", "http://127.0.0.1:5500"})
 public class ContributionController {
 
     // private final ResponseContributionDto responseContributionDto;
