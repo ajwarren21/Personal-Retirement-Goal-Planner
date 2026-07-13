@@ -28,7 +28,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/funding-source")
-@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:5500", "http://127.0.0.1:5500"})
+@CrossOrigin(origins = {"d3p6jm11yfu3uu.cloudfront.net", "http://localhost:4200", "http://localhost:5500", "http://127.0.0.1:5500"})
 public class FundingSourceController {
 
     private final FundingSourceService service;
