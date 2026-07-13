@@ -11,6 +11,7 @@ import com.skillstorm.services.UserService;
 import jakarta.validation.Valid;
 
 import java.security.Principal;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -60,15 +61,38 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(Principal principal) {
-    
-        if (principal == null) {
+    public ResponseEntity<?> login(Principal principal, HttpServletRequest request) {
+        // If the security filter already authenticated the request (e.g., via Basic), principal will be present
+        if (principal != null) {
+            User loggedInUser = userService.getUserByUsername(principal.getName());
+            return ResponseEntity.ok(loggedInUser);
+        }
+
+        // Otherwise attempt manual authentication using Authorization header (Basic)
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Basic ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
-        User loggedInUser = userService.getUserByUsername(principal.getName());
-        
-        return ResponseEntity.ok(loggedInUser);
+        try {
+            String base64Credentials = authHeader.substring("Basic ".length());
+            String credentials = new String(java.util.Base64.getDecoder().decode(base64Credentials));
+            final String[] values = credentials.split(":", 2);
+            String username = values[0];
+            String password = values.length > 1 ? values[1] : "";
+
+            var authRequest = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(username, password);
+            var authResult = authenticationManager.authenticate(authRequest);
+
+            org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(authResult);
+            // Ensure session is created so subsequent requests with cookie are authenticated
+            request.getSession(true);
+
+            User loggedInUser = userService.getUserByUsername(username);
+            return ResponseEntity.ok(loggedInUser);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
     }
 
     @PutMapping("/user")

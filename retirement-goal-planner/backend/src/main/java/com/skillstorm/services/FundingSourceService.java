@@ -33,6 +33,23 @@ public class FundingSourceService {
         return mapper.toDto(repo.findById(id).orElseThrow(() -> new SourceNotFoundException(id)));
     }
 
+    /**
+     * Get a funding source by ID with user ownership verification.
+     */
+    public ResponseFundingSourceDto getFundingSourceByIdForUser(long id, String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        FundingSource source = repo.findById(id)
+            .orElseThrow(() -> new SourceNotFoundException(id));
+        
+        // Verify the source belongs to this user
+        if (!source.getUser().getId().equals(user.getId())) {
+            throw new SourceNotFoundException(id);
+        }
+        
+        return mapper.toDto(source);
+    }
+
     public ResponseFundingSourceDto createSourceForUser(FundingSourceDto sourceDto, String username) {
         // Find the user object in the DB
         User user = userRepository.findByUsername(username)
@@ -53,7 +70,39 @@ public class FundingSourceService {
         return mapper.toDto(repo.save(entity));
     }
 
+    /**
+     * Update a funding source with user ownership verification.
+     */
+    public ResponseFundingSourceDto updateFundingSourceForUser(long id, FundingSourceDto dto, String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        var entity = repo.findById(id).orElseThrow(() -> new SourceNotFoundException(id));
+        
+        if (!entity.getUser().getId().equals(user.getId())) {
+            throw new SourceNotFoundException(id);
+        }
+        
+        mapper.updateEntityFromDto(dto, entity);
+        return mapper.toDto(repo.save(entity));
+    }
+
     public void deleteFundingSource(long id) {
+        repo.deleteById(id);
+    }
+
+    /**
+     * Delete a funding source with user ownership verification.
+     */
+    public void deleteFundingSourceForUser(long id, String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        FundingSource source = repo.findById(id)
+            .orElseThrow(() -> new SourceNotFoundException(id));
+        
+        if (!source.getUser().getId().equals(user.getId())) {
+            throw new SourceNotFoundException(id);
+        }
+        
         repo.deleteById(id);
     }
 

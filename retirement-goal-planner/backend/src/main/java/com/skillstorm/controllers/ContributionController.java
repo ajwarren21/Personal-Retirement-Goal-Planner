@@ -50,8 +50,8 @@ public class ContributionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseContributionDto> getById(@PathVariable long id) {
-        return ResponseEntity.ok(service.getById(id));
+    public ResponseEntity<ResponseContributionDto> getById(@PathVariable long id, Principal principal) {
+        return ResponseEntity.ok(service.getByIdForUser(id, principal.getName()));
     }
 
     @PostMapping
@@ -69,15 +69,15 @@ public class ContributionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseContributionDto> update(@PathVariable long id, @Valid @RequestBody ContributionDto dto) {
-        ResponseContributionDto updated = service.update(id, dto);
+    public ResponseEntity<ResponseContributionDto> update(@PathVariable long id, @Valid @RequestBody ContributionDto dto, Principal principal) {
+        ResponseContributionDto updated = service.updateForUser(id, dto, principal.getName());
         // Could maybe return this another way, test first
         return ResponseEntity.status(HttpStatus.OK).body(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
-        service.delete(id);
+    public ResponseEntity<String> delete(@PathVariable long id, Principal principal) {
+        service.deleteForUser(id, principal.getName());
         return ResponseEntity.ok("Deleted dividend payment");
     }
     

@@ -8,7 +8,7 @@ import com.skillstorm.dtos.FundingSourceDto;
 import com.skillstorm.dtos.ResponseFundingSourceDto;
 import com.skillstorm.models.FundingSource;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { com.skillstorm.mappers.ContributionMapper.class })
 public interface FundingSourceMapper {
 
     /**

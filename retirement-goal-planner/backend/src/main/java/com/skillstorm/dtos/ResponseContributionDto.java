@@ -15,11 +15,12 @@ import com.skillstorm.models.RetirementGoal;
 
 public record ResponseContributionDto(
     long id,
-    // User user,
-    RetirementGoal goal,
-    FundingSource fundingSource,
-    BigDecimal amount,
-    LocalDate contributionDate,
-    ContributionCategory category,
+    long retirementGoalId,
+    String retirementGoalName,
+    long fundingSourceId,
+    String fundingSourceName,
+    java.math.BigDecimal amount,
+    java.time.LocalDate contributionDate,
+    com.skillstorm.enums.ContributionCategory category,
     String notes
 ) {}

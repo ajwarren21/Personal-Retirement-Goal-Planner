@@ -44,8 +44,8 @@ public class FundingSourceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseFundingSourceDto> getById(@PathVariable long id) {
-        return ResponseEntity.ok(service.getFundingSourceById(id));
+    public ResponseEntity<ResponseFundingSourceDto> getById(@PathVariable long id, Principal principal) {
+        return ResponseEntity.ok(service.getFundingSourceByIdForUser(id, principal.getName()));
     }
 
 
@@ -64,14 +64,14 @@ public class FundingSourceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseFundingSourceDto> update(@PathVariable long id, @Valid @RequestBody FundingSourceDto dto) {
-        ResponseFundingSourceDto updated = service.updateFundingSource(id, dto);
+    public ResponseEntity<ResponseFundingSourceDto> update(@PathVariable long id, @Valid @RequestBody FundingSourceDto dto, Principal principal) {
+        ResponseFundingSourceDto updated = service.updateFundingSourceForUser(id, dto, principal.getName());
         return ResponseEntity.status(HttpStatus.OK).body(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
-        service.deleteFundingSource(id);
+    public ResponseEntity<String> delete(@PathVariable long id, Principal principal) {
+        service.deleteFundingSourceForUser(id, principal.getName());
         return ResponseEntity.ok("Deleted Funding Source Successfully");
     }
     

@@ -50,8 +50,8 @@ public class RetirementGoalController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseRetirementGoalDto> getById(@PathVariable long id) {
-        return ResponseEntity.ok(service.getById(id));
+    public ResponseEntity<ResponseRetirementGoalDto> getById(@PathVariable long id, Principal principal) {
+        return ResponseEntity.ok(service.getByIdForUser(id, principal.getName()));
     }
 
     
@@ -70,15 +70,15 @@ public class RetirementGoalController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseRetirementGoalDto> update(@PathVariable long id, @Valid @RequestBody RetirementGoalDto dto) {
-        ResponseRetirementGoalDto updated = service.update(id, dto);
+    public ResponseEntity<ResponseRetirementGoalDto> update(@PathVariable long id, @Valid @RequestBody RetirementGoalDto dto, Principal principal) {
+        ResponseRetirementGoalDto updated = service.updateForUser(id, dto, principal.getName());
         // Could maybe return this another way, test first
         return ResponseEntity.status(HttpStatus.OK).body(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
-        service.delete(id);
+    public ResponseEntity<String> delete(@PathVariable long id, Principal principal) {
+        service.deleteForUser(id, principal.getName());
         return ResponseEntity.ok("Deleted dividend payment");
     }
     

@@ -3,7 +3,8 @@ package com.skillstorm.dtos;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.skillstorm.models.Contribution;
+import java.util.List;
+import com.skillstorm.dtos.ResponseContributionDto;
 // import com.skillstorm.models.User;
 
 // import jakarta.validation.constraints.DecimalMin;
@@ -19,6 +20,6 @@ public record ResponseRetirementGoalDto(
     String name,
     Integer targetRetirementAge,
     BigDecimal targetAmount,
-    List<Contribution> contributions,
+    List<ResponseContributionDto> contributions,
     String notes
 ) {}

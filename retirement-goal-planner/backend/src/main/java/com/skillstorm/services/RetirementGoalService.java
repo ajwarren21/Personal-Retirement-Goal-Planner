@@ -44,6 +44,23 @@ public class RetirementGoalService {
         return mapper.toDto(r);
     }
 
+    /**
+     * Get a goal by ID with user ownership verification.
+     */
+    public ResponseRetirementGoalDto getByIdForUser(long id, String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        RetirementGoal r = repo.findById(id)
+            .orElseThrow(() -> new GoalNotFoundException(id));
+        
+        // Verify the goal belongs to this user
+        if (!r.getUser().getId().equals(user.getId())) {
+            throw new GoalNotFoundException(id);
+        }
+        
+        return mapper.toDto(r);
+    }
+
 
     public ResponseRetirementGoalDto createGoalForUser(RetirementGoalDto goalDto, String username) {
         // Find the user object in the DB
@@ -70,8 +87,42 @@ public class RetirementGoalService {
         return mapper.toDto(r);
     }
 
+    /**
+     * Update a goal with user ownership verification.
+     */
+    public ResponseRetirementGoalDto updateForUser(long id, RetirementGoalDto dto, String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        RetirementGoal r = repo.findById(id)
+            .orElseThrow(() -> new GoalNotFoundException(id));
+        
+        if (!r.getUser().getId().equals(user.getId())) {
+            throw new GoalNotFoundException(id);
+        }
+        
+        mapper.updateEntityFromDto(dto, r);
+        repo.save(r);
+        return mapper.toDto(r);
+    }
+
     public void delete(long id) {
         RetirementGoal r = repo.findById(id).orElseThrow(() -> new GoalNotFoundException(id));
+        repo.delete(r);
+    }
+
+    /**
+     * Delete a goal with user ownership verification.
+     */
+    public void deleteForUser(long id, String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        RetirementGoal r = repo.findById(id)
+            .orElseThrow(() -> new GoalNotFoundException(id));
+        
+        if (!r.getUser().getId().equals(user.getId())) {
+            throw new GoalNotFoundException(id);
+        }
+        
         repo.delete(r);
     }
 

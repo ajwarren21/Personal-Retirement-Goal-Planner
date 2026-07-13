@@ -14,28 +14,14 @@ import com.skillstorm.models.Contribution;
 @Mapper(componentModel = "spring")
 public interface ContributionMapper {
 
-
-    /**
-     * Map from dto to entity
-     * @param dto dto to map
-     * @return Contribution entity 
-    */
-    // @Mapping(target = "id", ignore = true)
     Contribution toEntity(ContributionDto dto);
 
-    /**
-     * Map from entity to Dto
-     * @param entity entity to map
-     * @return ResponseContributionDto
-     */
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "retirementGoalId", source = "goal.id")
+    @Mapping(target = "retirementGoalName", source = "goal.name")
+    @Mapping(target = "fundingSourceId", source = "fundingSource.id")
+    @Mapping(target = "fundingSourceName", source = "fundingSource.name")
     ResponseContributionDto toDto(Contribution entity);
 
-    /**
-     * Updates the entity found in the database from the given dto
-     * @param dto dto with fields to update to
-     * @param entity entity to be updated
-     */
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDto(ContributionDto dto, @MappingTarget Contribution entity);
 

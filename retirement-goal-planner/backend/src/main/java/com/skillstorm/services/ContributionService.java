@@ -51,11 +51,45 @@ public class ContributionService {
         return mapper.toDto(c);
     }
 
+    /**
+     * Get a contribution by ID with user ownership verification.
+     */
+    public ResponseContributionDto getByIdForUser(long id, String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Contribution c = repo.findById(id)
+            .orElseThrow(() -> new ContributionNotFoundException(id));
+        
+        if (!c.getUser().getId().equals(user.getId())) {
+            throw new ContributionNotFoundException(id);
+        }
+        
+        return mapper.toDto(c);
+    }
+
     public ResponseContributionDto update(long id, ContributionDto dto) {
         Contribution c = repo.findById(id).orElseThrow(() -> new ContributionNotFoundException(id));
  
         mapper.updateEntityFromDto(dto, c);
  
+        repo.save(c);
+        return mapper.toDto(c);
+    }
+
+    /**
+     * Update a contribution with user ownership verification.
+     */
+    public ResponseContributionDto updateForUser(long id, ContributionDto dto, String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Contribution c = repo.findById(id)
+            .orElseThrow(() -> new ContributionNotFoundException(id));
+        
+        if (!c.getUser().getId().equals(user.getId())) {
+            throw new ContributionNotFoundException(id);
+        }
+
+        mapper.updateEntityFromDto(dto, c);
         repo.save(c);
         return mapper.toDto(c);
     }
@@ -93,6 +127,22 @@ public class ContributionService {
 
     public void delete(long id) {
         Contribution c = repo.findById(id).orElseThrow(() -> new ContributionNotFoundException(id));
+        repo.delete(c);
+    }
+
+    /**
+     * Delete a contribution with user ownership verification.
+     */
+    public void deleteForUser(long id, String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Contribution c = repo.findById(id)
+            .orElseThrow(() -> new ContributionNotFoundException(id));
+        
+        if (!c.getUser().getId().equals(user.getId())) {
+            throw new ContributionNotFoundException(id);
+        }
+        
         repo.delete(c);
     }
     

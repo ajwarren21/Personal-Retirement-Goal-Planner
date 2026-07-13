@@ -11,7 +11,7 @@ import com.skillstorm.dtos.ResponseRetirementGoalDto;
 import com.skillstorm.dtos.RetirementGoalDto;
 import com.skillstorm.models.RetirementGoal;
  
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { com.skillstorm.mappers.ContributionMapper.class })
 public interface RetirementGoalMapper {
 
 
