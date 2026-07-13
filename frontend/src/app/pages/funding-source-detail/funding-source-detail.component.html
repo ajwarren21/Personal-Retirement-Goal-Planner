@@ -1,0 +1,223 @@
+<div class="p-6 max-w-6xl mx-auto">
+
+  <!-- Header with back button -->
+  <div class="mb-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button
+        pButton
+        icon="pi pi-arrow-left"
+        class="p-button-text p-button-sm"
+        (click)="goBack()">
+      </button>
+      <div>
+        @if (!loading()) {
+          <h1 class="text-2xl font-semibold text-gray-800">{{ fundingSource()?.name }}</h1>
+          <p class="text-gray-500 text-sm mt-1">Funding Source Details & Contributions</p>
+        }
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button
+        pButton
+        icon="pi pi-pencil"
+        label="Edit"
+        class="p-button-sm p-button-secondary"
+        (click)="handleEditSource()"
+        [disabled]="!fundingSource()">
+      </button>
+      <button
+        pButton
+        icon="pi pi-trash"
+        label="Delete"
+        class="p-button-sm p-button-danger"
+        (click)="handleDeleteSource()"
+        [disabled]="!fundingSource()">
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="flex justify-center items-center h-48">
+      <p-progress-spinner strokeWidth="4" />
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (error()) {
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!loading() && !error() && fundingSource()) {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+      <!-- Source Type Card -->
+      <p-card class="shadow-md">
+        <ng-template pTemplate="header">
+          <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-32 flex items-center justify-center text-white text-2xl font-bold">
+            Source Type
+          </div>
+        </ng-template>
+        <div class="text-center">
+          <p-tag [value]="getSourceTypeLabel(fundingSource()!.sourceType)" [severity]="getSourceTypeSeverity(fundingSource()!.sourceType)"></p-tag>
+          <p class="text-gray-500 text-sm mt-2">{{ fundingSource()!.sourceType }}</p>
+        </div>
+      </p-card>
+
+      <!-- Total Contributed Card -->
+      <p-card class="shadow-md">
+        <ng-template pTemplate="header">
+          <div class="bg-gradient-to-r from-green-500 to-green-600 h-32 flex items-center justify-center text-white text-2xl font-bold">
+            Contributed
+          </div>
+        </ng-template>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-600">{{ totalContributed() | currency }}</div>
+          <p class="text-gray-500 text-sm mt-2">Total deposited from this source</p>
+        </div>
+      </p-card>
+
+      <!-- Goals Supported Card -->
+      <p-card class="shadow-md">
+        <ng-template pTemplate="header">
+          <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-32 flex items-center justify-center text-white text-2xl font-bold">
+            Goals
+          </div>
+        </ng-template>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-purple-600">{{ totalGoalsSupported().size }}</div>
+          <p class="text-gray-500 text-sm mt-2">Retirement goals funded</p>
+        </div>
+      </p-card>
+
+    </div>
+
+    <!-- Source Details Section -->
+    <p-card class="shadow-md mb-6">
+      <ng-template pTemplate="header">
+        <div class="bg-gray-100 px-4 py-3 font-semibold text-gray-800">Source Details</div>
+      </ng-template>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-600 font-medium">Institution</p>
+          <p class="text-lg font-semibold text-gray-800">{{ fundingSource()!.institution }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600 font-medium">Account Name</p>
+          <p class="text-lg font-semibold text-gray-800">{{ fundingSource()!.name }}</p>
+        </div>
+      </div>
+      @if (fundingSource()!.notes) {
+        <div class="mt-4 pt-4 border-t">
+          <p class="text-sm text-gray-600 font-medium">Notes</p>
+          <p class="text-gray-700 mt-1">{{ fundingSource()!.notes }}</p>
+        </div>
+      }
+    </p-card>
+
+    <!-- Contributions Section -->
+    <p-card class="shadow-md">
+      <ng-template pTemplate="header">
+        <div class="bg-gray-100 px-4 py-3 font-semibold text-gray-800">
+          Contributions from This Source
+        </div>
+      </ng-template>
+
+      @if ((fundingSource()!.contributions ?? []).length > 0) {
+        <p-table [value]="fundingSource()!.contributions ?? []" responsiveLayout="scroll" styleClass="p-datatable-striped">
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="retirementGoal.name">Retirement Goal <p-sortIcon field="retirementGoal.name" /></th>
+              <th pSortableColumn="amount">Amount <p-sortIcon field="amount" /></th>
+              <th pSortableColumn="contributionDate">Date <p-sortIcon field="contributionDate" /></th>
+              <th pSortableColumn="category">Category <p-sortIcon field="category" /></th>
+              <th>Notes</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-contribution>
+            <tr>
+              <td class="font-medium">
+                <a
+                  [routerLink]="['/retirement-goals', contribution.retirementGoal?.id ?? contribution.retirementGoalId]"
+                  class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                  {{ contribution.retirementGoal?.name || contribution.retirementGoalName }}
+                </a>
+              </td>
+              <td>{{ contribution.amount | currency }}</td>
+              <td>{{ contribution.contributionDate }}</td>
+              <td>
+                <p-tag
+                  [value]="contribution.category"
+                  [severity]="contribution.category === 'EMPLOYER_MATCH' ? 'success' : (contribution.category === 'ROLLOVER' ? 'info' : 'secondary')">
+                </p-tag>
+              </td>
+              <td class="text-gray-500 text-sm">{{ contribution.notes || '—' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      } @else {
+        <div class="text-center text-gray-500 py-8">
+          <p class="text-sm italic">No contributions logged yet from this source.</p>
+        </div>
+      }
+
+    </p-card>
+  }
+
+  <!-- Edit Source Dialog -->
+  <p-dialog
+    header="Edit Funding Source"
+    [(visible)]="showEditDialog"
+    [modal]="true"
+    [style]="{ width: '28rem' }"
+    [draggable]="false">
+
+    <form [formGroup]="editForm" (ngSubmit)="saveSource()" class="flex flex-col gap-4 pt-2">
+
+      <p-iftalabel>
+        <input pInputText id="name" formControlName="name" class="w-full" />
+        <label for="name">Account Name</label>
+      </p-iftalabel>
+      @if (editForm.get('name')?.invalid && editForm.get('name')?.touched) {
+        <span class="text-red-500 text-xs -mt-2">Name must be at least 2 characters</span>
+      }
+
+      <div class="flex flex-col gap-1">
+        <label for="sourceType" class="font-medium">Source Type</label>
+        <p-select
+          inputId="sourceType"
+          formControlName="sourceType"
+          [options]="sourceTypeOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select source type"
+          styleClass="w-full">
+        </p-select>
+      </div>
+
+      <p-iftalabel>
+        <input pInputText id="institution" formControlName="institution" class="w-full" />
+        <label for="institution">Institution</label>
+      </p-iftalabel>
+      @if (editForm.get('institution')?.invalid && editForm.get('institution')?.touched) {
+        <span class="text-red-500 text-xs -mt-2">Institution is required</span>
+      }
+
+      <p-iftalabel>
+        <textarea pTextarea id="notes" formControlName="notes" rows="3" class="w-full"></textarea>
+        <label for="notes">Notes</label>
+      </p-iftalabel>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button pButton type="button" label="Cancel" class="p-button-text p-button-sm" (click)="showEditDialog.set(false)"></button>
+        <button pButton type="submit" label="Save" icon="pi pi-check" class="p-button-sm"></button>
+      </div>
+
+    </form>
+
+  </p-dialog>
+
+</div>

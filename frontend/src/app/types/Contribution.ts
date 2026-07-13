@@ -13,8 +13,16 @@ export enum ContributionCategory {
  */
 export interface Contribution {
   id: number;
-  fundingSource: FundingSource;
-  retirementGoal: RetirementGoal;
+  // Detailed nested objects (may be absent if backend returns flattened DTO)
+  fundingSource?: FundingSource;
+  retirementGoal?: RetirementGoal;
+
+  // Flattened fields returned by backend mappers
+  fundingSourceId?: number;
+  fundingSourceName?: string;
+  retirementGoalId?: number;
+  retirementGoalName?: string;
+
   amount: number;
   contributionDate: string; // ISO date string like "2026-07-09"
   category: ContributionCategory;

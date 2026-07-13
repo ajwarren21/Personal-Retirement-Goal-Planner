@@ -51,7 +51,13 @@
 
       <ng-template pTemplate="body" let-source>
         <tr>
-          <td class="font-medium">{{ source.name }}</td>
+          <td class="font-medium">
+            <a
+              [routerLink]="['/funding-sources', source.id]"
+              class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+              {{ source.name }}
+            </a>
+          </td>
           <td>{{ source.institution }}</td>
           <td class="text-gray-500 text-sm">{{ source.notes || '—' }}</td>
           <td>

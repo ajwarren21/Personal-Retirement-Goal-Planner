@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +20,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     FormsModule,
     ReactiveFormsModule,
     TableModule,

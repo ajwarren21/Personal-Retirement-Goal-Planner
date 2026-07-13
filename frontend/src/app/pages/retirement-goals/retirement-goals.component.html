@@ -62,7 +62,13 @@
                 (click)="toggleExpand(goal)">
             </button>
             </td>
-            <td class="font-medium">{{ goal.name }}</td>
+            <td class="font-medium">
+              <a
+                [routerLink]="['/retirement-goals', goal.id]"
+                class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                {{ goal.name }}
+              </a>
+            </td>
             <td>{{ goal.targetRetirementAge }}</td>
             <td>{{ goal.targetAmount | currency }}</td>
             <td class="text-gray-500 text-sm">{{ goal.notes || '—' }}</td>
@@ -108,7 +114,7 @@
                   <tbody>
                     @for (contribution of goal.contributions; track contribution.id) {
                       <tr class="border-b last:border-0">
-                        <td class="py-1">{{ contribution.fundingSource?.name }}</td>
+                        <td class="py-1">{{ contribution.fundingSource?.name || contribution.fundingSourceName }}</td>
                         <td class="py-1">{{ contribution.amount | currency }}</td>
                         <td class="py-1">{{ contribution.contributionDate }}</td>
                         <td class="py-1">{{ contribution.category }}</td>
