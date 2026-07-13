@@ -40,10 +40,7 @@ public class SecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("https://d1dpzej41c5vns.cloudfront.net",
-    "http://localhost:4200",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500"));
+        config.setAllowedOrigins(List.of("http://localhost:4200"));
         config.setAllowedMethods(List.of(
                 "GET",
                 "POST",
@@ -81,7 +78,8 @@ public class SecurityConfig {
                 
                     .ignoringRequestMatchers(
             "/api/auth/login",
-                        "/api/auth/register")
+                        "/api/auth/register",
+                        "/api/auth/csrf")
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                     .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
