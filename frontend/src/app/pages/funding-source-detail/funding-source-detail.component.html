@@ -173,7 +173,8 @@
     [(visible)]="showEditDialog"
     [modal]="true"
     [style]="{ width: '28rem' }"
-    [draggable]="false">
+    [draggable]="false"
+    [focusOnShow]="false">
 
     <form [formGroup]="editForm" (ngSubmit)="saveSource()" class="flex flex-col gap-4 pt-2">
 

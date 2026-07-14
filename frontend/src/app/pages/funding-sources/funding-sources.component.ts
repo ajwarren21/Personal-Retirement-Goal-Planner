@@ -122,7 +122,7 @@ export class FundingSourcesComponent implements OnInit {
     } else {
       // UPDATE
       const id = this.selectedFundingSource()!.id!;
-      this.fundingSourceService.udpateFundingSource(id, payload).subscribe({
+      this.fundingSourceService.updateFundingSource(id, payload).subscribe({
         next: (data) => {
           this.fundingSources.update((currentList) =>
             currentList.map(source => source.id === data.id ? data : source)

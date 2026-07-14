@@ -67,8 +67,10 @@ export class DashboardComponent implements OnInit {
       0
     );
 
-    // Until contributions exist
-    this.totalContributed = 0;
+    this.totalContributed = this.goals.reduce(
+      (sum, goal) => sum + (goal.contributions ?? []).reduce((contribSum, contrib) => contribSum + contrib.amount, 0),
+      0
+    );
 
   }
 

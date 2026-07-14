@@ -37,6 +37,8 @@ public interface RetirementGoalMapper {
      * @param entity entity to be updated
      */
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "contributions", ignore = true)
     void updateEntityFromDto(RetirementGoalDto dto, @MappingTarget RetirementGoal entity);
 
 }

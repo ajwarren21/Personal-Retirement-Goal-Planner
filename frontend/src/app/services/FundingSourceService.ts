@@ -42,7 +42,7 @@ export class FundingSourceService {
     );
 }
 
-  udpateFundingSource(id: number, fundingSource: FundingSource): Observable<FundingSource> {
+  updateFundingSource(id: number, fundingSource: FundingSource): Observable<FundingSource> {
     return this.http.put<FundingSource>(`${this.URL}/${id}`, fundingSource, this.getHttpOptions())
       .pipe(
         catchError(() => throwError(() => new Error("Failed to update Funding Source.")))
