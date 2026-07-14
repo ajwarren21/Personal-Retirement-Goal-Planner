@@ -13,6 +13,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
@@ -38,6 +39,7 @@ export class ProfileComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private fb: FormBuilder,
+    private location: Location
   ) {}
   
 
@@ -128,5 +130,9 @@ export class ProfileComponent implements OnInit {
   onLogout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }
