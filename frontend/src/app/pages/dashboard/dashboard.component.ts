@@ -116,6 +116,7 @@ export class DashboardComponent implements OnInit {
       return 0;
     }
     return Math.min(100, Math.round((this.totalContributed / this.totalTargetAmount) * 100));
+    // this only does it by 1 percent at a time, maybe look into more precision
   }
 
 }
