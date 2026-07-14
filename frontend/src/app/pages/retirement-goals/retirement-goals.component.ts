@@ -6,6 +6,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -33,6 +34,7 @@ import { FundingSource } from '../../types/FundingSource';
     TagModule,
     ButtonModule,
     ProgressSpinnerModule,
+    ProgressBarModule,
     DialogModule,
     InputTextModule,
     SelectModule,
@@ -40,7 +42,8 @@ import { FundingSource } from '../../types/FundingSource';
     IftaLabelModule,
     InputNumberModule
   ],
-  templateUrl: './retirement-goals.component.html'
+  templateUrl: './retirement-goals.component.html',
+  styleUrls: ['./retirement-goals.component.css']
 })
 export class RetirementGoalsComponent implements OnInit {
 
@@ -81,7 +84,7 @@ export class RetirementGoalsComponent implements OnInit {
 
   form!: FormGroup;
 
-  // ---- Contribution state ----
+  // Contribution state signals 
   fundingSources = signal<FundingSource[]>([]);
   showContributionDialog = signal<boolean>(false);
   contributionForm!: FormGroup;
@@ -244,6 +247,35 @@ export class RetirementGoalsComponent implements OnInit {
 
   totalContributed(goal: RetirementGoal): number {
     return (goal.contributions ?? []).reduce((sum, c) => sum + c.amount, 0);
+  }
+
+  // Percentage (0-100) of the target amount that has been contributed so far. 
+  progressPercent(goal: RetirementGoal): number {
+    const target = goal.targetAmount || 0;
+    if (target <= 0) {
+      return 0;
+    }
+    return Math.min(100, Math.round((this.totalContributed(goal) / target) * 100));
+  }
+
+  getCategoryLabel(category: ContributionCategory): string {
+    return this.categoryOptions.find(option => option.value === category)?.label ?? category;
+  }
+
+  /** Maps a contribution category to a p-tag severity so categories are visually distinct. */
+  getCategorySeverity(category: ContributionCategory): 'success' | 'info' | 'warn' | 'secondary' {
+    switch (category) {
+      case ContributionCategory.EMPLOYER_MATCH:
+        return 'success';
+      case ContributionCategory.EMPLOYER_SALARY_DEFERRAL:
+        return 'info';
+      case ContributionCategory.CATCH_UP_CONTRIBUTION:
+        return 'warn';
+      case ContributionCategory.ROLLOVER:
+        return 'secondary';
+      default:
+        return 'secondary';
+    }
   }
 
   handleAddContribution(goal: RetirementGoal): void {

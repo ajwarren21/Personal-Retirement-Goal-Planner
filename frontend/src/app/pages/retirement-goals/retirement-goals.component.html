@@ -1,10 +1,9 @@
-<div class="p-6 max-w-6xl mx-auto">
+<div class="rg-page p-6 max-w-6xl mx-auto">
 
-  <!-- Header -->
-  <div class="mb-6 flex items-center justify-between">
+  <div class="rg-header mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-semibold text-gray-800">Retirement Goals</h1>
-      <p class="text-gray-500 text-sm mt-1">All retirement accounts linked to your profile</p>
+      <h1 class="rg-title text-2xl font-semibold">Retirement Goals</h1>
+      <p class="rg-subtitle text-sm mt-1">All retirement accounts linked to your profile</p>
     </div>
     <button
       pButton
@@ -17,150 +16,163 @@
 
   <!-- Loading state -->
   @if (loading()) {
-    <div class="flex justify-center items-center h-48">
+    <div class="rg-state flex justify-center items-center h-48">
       <p-progress-spinner strokeWidth="4" />
     </div>
   }
 
   <!-- Error state -->
   @if (error()) {
-    <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+    <div class="rg-state rg-error p-4 text-sm">
       {{ error() }}
     </div>
   }
 
   <!-- Table -->
   @if (!loading() && !error()) {
-    <p-table
-      [value]="retirementGoals()"
-      dataKey="id"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="[5, 10, 25]"
-      styleClass="p-datatable-striped"
-      [tableStyle]="{ 'min-width': '60rem' }">
+    <div class="rg-table-card">
+      <p-table
+        [value]="retirementGoals()"
+        dataKey="id"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 25]"
+        styleClass="p-datatable-striped"
+        [tableStyle]="{ 'min-width': '60rem' }">
 
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 3rem"></th>
-          <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
-          <th pSortableColumn="targetRetirementAge">Target Retirement Age <p-sortIcon field="targetRetirementAge" /></th>
-          <th pSortableColumn="targetAmount">Target Amount <p-sortIcon field="targetAmount" /></th>
-          <th>Notes</th>
-          <th>Actions</th>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="body" let-goal>
-        <tr>
-            <td>
-            <button
-                type="button"
-                pButton
-                class="p-button-text p-button-sm p-button-rounded"
-                [icon]="isExpanded(goal) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-                (click)="toggleExpand(goal)">
-            </button>
-            </td>
-            <td class="font-medium">
-              <a
-                [routerLink]="['/retirement-goals', goal.id]"
-                class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
-                {{ goal.name }}
-              </a>
-            </td>
-            <td>{{ goal.targetRetirementAge }}</td>
-            <td>{{ goal.targetAmount | currency }}</td>
-            <td class="text-gray-500 text-sm">{{ goal.notes || '—' }}</td>
-            <td>
-            <div class="flex gap-2">
-                <button pButton icon="pi pi-pencil" class="p-button-sm p-button-text p-button-secondary" (click)="handleUpdateRetirementGoal(goal)"></button>
-                <button pButton icon="pi pi-trash" class="p-button-sm p-button-text p-button-danger" (click)="handleDeleteRetirementGoal(goal)"></button>
-            </div>
-            </td>
-        </tr>
-
-        @if (isExpanded(goal)) {
-            <tr>
-          <td colspan="6">
-            <div class="p-4 bg-gray-50 rounded">
-
-              <div class="flex items-center justify-between mb-3">
-                <div class="text-sm text-gray-600">
-                  <strong>{{ totalContributed(goal) | currency }}</strong> contributed
-                  of {{ goal.targetAmount | currency }} target
-                </div>
-                <button
-                  pButton
-                  label="Add Contribution"
-                  icon="pi pi-plus"
-                  class="p-button-sm p-button-outlined"
-                  (click)="handleAddContribution(goal)">
-                </button>
-              </div>
-
-              @if (goal.contributions && goal.contributions.length > 0) {
-                <table class="w-full text-sm">
-                  <thead>
-                    <tr class="text-left text-gray-500 border-b">
-                      <th class="py-1">Funding Source</th>
-                      <th class="py-1">Amount</th>
-                      <th class="py-1">Date</th>
-                      <th class="py-1">Category</th>
-                      <th class="py-1">Notes</th>
-                      <th class="py-1"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (contribution of goal.contributions; track contribution.id) {
-                      <tr class="border-b last:border-0">
-                        <td class="py-1">{{ contribution.fundingSource?.name || contribution.fundingSourceName }}</td>
-                        <td class="py-1">{{ contribution.amount | currency }}</td>
-                        <td class="py-1">{{ contribution.contributionDate }}</td>
-                        <td class="py-1">{{ contribution.category }}</td>
-                        <td class="py-1 text-gray-500">{{ contribution.notes || '—' }}</td>
-                        <td class="py-1">
-                          <div class="flex gap-1">
-                            <button
-                              pButton
-                              icon="pi pi-pencil"
-                              class="p-button-sm p-button-text p-button-secondary"
-                              (click)="handleEditContribution(goal, contribution)">
-                            </button>
-                            <button
-                              pButton
-                              icon="pi pi-trash"
-                              class="p-button-sm p-button-text p-button-danger"
-                              (click)="deleteContribution(contribution)">
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              } @else {
-                <p class="text-gray-400 text-sm italic">No contributions yet for this goal.</p>
-              }
-
-            </div>
-          </td>
-        </tr>
-        }
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem"></th>
+            <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
+            <th pSortableColumn="targetRetirementAge">Target Retirement Age <p-sortIcon field="targetRetirementAge" /></th>
+            <th pSortableColumn="targetAmount">Target Amount <p-sortIcon field="targetAmount" /></th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
         </ng-template>
 
-      <!-- Expanded row: contributions for this goal -->
-      
+        <ng-template pTemplate="body" let-goal>
+          <tr>
+              <td>
+              <button
+                  type="button"
+                  pButton
+                  class="rg-expand-toggle p-button-text p-button-sm p-button-rounded"
+                  [icon]="isExpanded(goal) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                  (click)="toggleExpand(goal)">
+              </button>
+              </td>
+              <td class="font-medium">
+                <a
+                  [routerLink]="['/retirement-goals', goal.id]"
+                  class="rg-name-link">
+                  {{ goal.name }}
+                </a>
+              </td>
+              <td>{{ goal.targetRetirementAge }}</td>
+              <td>{{ goal.targetAmount | currency }}</td>
+              <td class="rg-notes-cell text-sm">{{ goal.notes || '—' }}</td>
+              <td>
+              <div class="flex gap-2">
+                  <button pButton icon="pi pi-pencil" class="p-button-sm p-button-text p-button-secondary" (click)="handleUpdateRetirementGoal(goal)"></button>
+                  <button pButton icon="pi pi-trash" class="p-button-sm p-button-text p-button-danger" (click)="handleDeleteRetirementGoal(goal)"></button>
+              </div>
+              </td>
+          </tr>
 
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="6" class="text-center text-gray-500 py-8">
-            No Retirement Goals found. Add one to get started.
-          </td>
-        </tr>
-      </ng-template>
+          @if (isExpanded(goal)) {
+              <tr class="rg-expanded-row">
+            <td colspan="6">
+              <div class="rg-expanded-panel">
 
-    </p-table>
+                <div class="rg-progress-row">
+                  <div class="rg-progress-info">
+                    <div class="rg-progress-amounts">
+                      <strong>{{ totalContributed(goal) | currency }}</strong> contributed of {{ goal.targetAmount | currency }} target
+                    </div>
+                    <p-progressbar
+                      [value]="progressPercent(goal)"
+                      [showValue]="false"
+                      styleClass="rg-progress-track">
+                    </p-progressbar>
+                  </div>
+                  <button
+                    pButton
+                    label="Add Contribution"
+                    icon="pi pi-plus"
+                    class="p-button-sm p-button-outlined"
+                    (click)="handleAddContribution(goal)">
+                  </button>
+                </div>
+
+                @if (goal.contributions && goal.contributions.length > 0) {
+                  <table class="rg-sub-table">
+                    <thead>
+                      <tr>
+                        <th>Funding Source</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Notes</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (contribution of goal.contributions; track contribution.id) {
+                        <tr>
+                          <td>{{ contribution.fundingSource?.name || contribution.fundingSourceName }}</td>
+                          <td>{{ contribution.amount | currency }}</td>
+                          <td>{{ contribution.contributionDate }}</td>
+                          <td>
+                            <p-tag
+                              [value]="getCategoryLabel(contribution.category)"
+                              [severity]="getCategorySeverity(contribution.category)">
+                            </p-tag>
+                          </td>
+                          <td class="rg-sub-notes">{{ contribution.notes || '—' }}</td>
+                          <td>
+                            <div class="flex gap-1">
+                              <button
+                                pButton
+                                icon="pi pi-pencil"
+                                class="p-button-sm p-button-text p-button-secondary"
+                                (click)="handleEditContribution(goal, contribution)">
+                              </button>
+                              <button
+                                pButton
+                                icon="pi pi-trash"
+                                class="p-button-sm p-button-text p-button-danger"
+                                (click)="deleteContribution(contribution)">
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                } @else {
+                  <p class="rg-empty-note">No contributions yet for this goal.</p>
+                }
+
+              </div>
+            </td>
+          </tr>
+          }
+          </ng-template>
+
+        <!-- Expanded row: contributions for this goal -->
+
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center rg-notes-cell py-8">
+              No Retirement Goals found. Add one to get started.
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </div>
   }
 
   <!-- Create / Update Goal Dialog -->
@@ -183,7 +195,7 @@
       }
 
       <div class="flex flex-col gap-1">
-        <label for="targetRetirementAge" class="font-medium">Target Retirement Age</label>
+        <label for="targetRetirementAge" class="rg-field-label">Target Retirement Age</label>
         <p-inputNumber
           inputId="targetRetirementAge"
           formControlName="targetRetirementAge"
@@ -196,7 +208,7 @@
       </div>
 
       <div class="flex flex-col gap-1">
-        <label for="targetAmount" class="font-medium">Target Amount</label>
+        <label for="targetAmount" class="rg-field-label">Target Amount</label>
         <p-inputNumber
           inputId="targetAmount"
           formControlName="targetAmount"
@@ -233,7 +245,7 @@
     [draggable]="false"
     [focusOnShow]="false">
 
-    <p class="text-gray-700">
+    <p>
       Are you sure you want to delete
       <strong>{{ selectedRetirementGoal()?.name }}</strong>?
       This action cannot be undone.
@@ -258,7 +270,7 @@
     <form [formGroup]="contributionForm" (ngSubmit)="saveContribution()" class="flex flex-col gap-4 pt-2">
 
       <div class="flex flex-col gap-1">
-        <label for="fundingSourceId" class="font-medium">Funding Source</label>
+        <label for="fundingSourceId" class="rg-field-label">Funding Source</label>
         <p-select
           inputId="fundingSourceId"
           formControlName="fundingSourceId"
@@ -274,7 +286,7 @@
       </div>
 
       <div class="flex flex-col gap-1">
-        <label for="amount" class="font-medium">Amount</label>
+        <label for="amount" class="rg-field-label">Amount</label>
         <p-inputNumber
           inputId="amount"
           formControlName="amount"
@@ -289,7 +301,7 @@
       </div>
 
       <div class="flex flex-col gap-1">
-        <label for="contributionDate" class="font-medium">Contribution Date</label>
+        <label for="contributionDate" class="rg-field-label">Contribution Date</label>
         <input
           pInputText
           type="date"
@@ -302,7 +314,7 @@
       </div>
 
       <div class="flex flex-col gap-1">
-        <label for="category" class="font-medium">Category</label>
+        <label for="category" class="rg-field-label">Category</label>
         <p-select
           inputId="category"
           formControlName="category"

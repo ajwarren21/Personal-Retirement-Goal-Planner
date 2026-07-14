@@ -1,0 +1,184 @@
+/*
+ * The page lives inside a dark app shell now because for the drop down it 
+ * was using the defualt white background with the same text colors, so it
+ * ended up being white on white. This way it should never have that problem.
+ *
+ * It does seem to mess up the profile editing slightly, but not too bad.
+ */
+
+:host {
+  --rg-bg: #12151a;
+  --rg-surface: #1a1e25;
+  --rg-surface-raised: #20242c;
+  --rg-border: #2a2f39;
+  --rg-text: #e7e9ec;
+  --rg-text-muted: #9aa2ad;
+  --rg-accent: #34d399;
+}
+
+/* ---------- Page shell ---------- */
+
+.rg-page {
+  color: var(--rg-text);
+}
+
+.rg-header {
+  border-bottom: 1px solid var(--rg-border);
+  padding-bottom: 1.25rem;
+}
+
+.rg-title {
+  letter-spacing: -0.01em;
+}
+
+.rg-subtitle {
+  color: var(--rg-text-muted);
+}
+
+/* ---------- States ---------- */
+
+.rg-state {
+  border: 1px solid var(--rg-border);
+  border-radius: 0.75rem;
+  background: var(--rg-surface);
+}
+
+.rg-error {
+  border-color: #7f1d1d;
+  background: rgba(127, 29, 29, 0.15);
+  color: #fca5a5;
+}
+
+/* ---------- Table wrapper ---------- */
+
+.rg-table-card {
+  border: 1px solid var(--rg-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.rg-name-link {
+  color: var(--rg-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.rg-name-link:hover {
+  text-decoration: underline;
+}
+
+.rg-notes-cell {
+  color: var(--rg-text-muted);
+}
+
+.rg-expand-toggle {
+  color: var(--rg-text-muted) !important; /* leaving it like this for now */
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.rg-expand-toggle:hover {
+  color: var(--rg-accent) !important;
+}
+
+/* ---------- Expanded contribution panel ---------- */
+
+.rg-expanded-row td {
+  padding: 0 !important;
+  background: var(--rg-bg);
+}
+
+.rg-expanded-panel {
+  padding: 1.25rem 1.5rem;
+  background: var(--rg-surface);
+  border-top: 1px solid var(--rg-border);
+  border-bottom: 1px solid var(--rg-border);
+  color: var(--rg-text);
+}
+
+.rg-progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rg-progress-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rg-progress-amounts {
+  font-size: 0.875rem;
+  color: var(--rg-text-muted);
+  margin-bottom: 0.375rem;
+}
+
+.rg-progress-amounts strong {
+  color: var(--rg-text);
+  font-weight: 700;
+}
+
+.rg-progress-track {
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--rg-border);
+  overflow: hidden;
+}
+
+.rg-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--rg-accent);
+  transition: width 0.3s ease;
+}
+
+/* ---------- Inner table ---------- */
+
+.rg-sub-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.rg-sub-table thead th {
+  text-align: left;
+  color: var(--rg-text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--rg-border);
+  padding: 0.5rem 0.5rem;
+}
+
+.rg-sub-table tbody td {
+  /* padding: 0.6rem 0.5rem; */
+  /* padding: 1px; */
+  padding: 0.2rem 0.6rem !important;
+  color: var(--rg-text);
+  border-bottom: 1px solid var(--rg-border);
+}
+
+.rg-sub-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.rg-sub-table tbody tr:hover td {
+  background: var(--rg-surface-raised);
+}
+
+.rg-sub-notes {
+  color: var(--rg-text-muted);
+}
+
+.rg-empty-note {
+  color: var(--rg-text-muted);
+  font-style: italic;
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+}
+
+
+.rg-field-label {
+  color: var(--rg-text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
