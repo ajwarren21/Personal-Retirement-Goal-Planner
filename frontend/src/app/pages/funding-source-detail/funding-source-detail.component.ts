@@ -126,11 +126,11 @@ export class FundingSourceDetailComponent implements OnInit {
       return;
     }
 
-    const sourceId = this.fundingSource()?.id;
+    const sourceId = this.fundingSource()!.id!;
     if (!sourceId) return;
 
     const payload = this.editForm.value;
-    this.fundingSourceService.udpateFundingSource(sourceId, payload).subscribe({
+    this.fundingSourceService.updateFundingSource(sourceId, payload).subscribe({
       next: (data) => {
         this.fundingSource.set(data);
         this.showEditDialog.set(false);
@@ -147,7 +147,7 @@ export class FundingSourceDetailComponent implements OnInit {
       return;
     }
 
-    const sourceId = this.fundingSource()?.id;
+    const sourceId = this.fundingSource()!.id!;
     if (!sourceId) return;
 
     this.fundingSourceService.deleteFundingSource(sourceId).subscribe({

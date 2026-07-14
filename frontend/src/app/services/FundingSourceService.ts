@@ -52,7 +52,10 @@ export class FundingSourceService {
   deleteFundingSource(id: number): Observable<void> {
     return this.http.delete<void>(`${this.URL}/${id}`, this.getHttpOptions())
       .pipe(
-        catchError(() => throwError(() => new Error("Failed to delete Funding Source.")))
-      );
+        catchError((error) => {
+        console.error('Delete error details:', error.status, error.error, error);
+        return throwError(() => new Error("Failed to delete Funding Source."));
+      })
+    );
   }
 }

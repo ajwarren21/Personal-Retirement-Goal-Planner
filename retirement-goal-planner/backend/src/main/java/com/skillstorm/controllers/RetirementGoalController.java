@@ -77,9 +77,9 @@ public class RetirementGoalController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id, Principal principal) {
+    public ResponseEntity<Void> delete(@PathVariable long id, Principal principal) {
         service.deleteForUser(id, principal.getName());
-        return ResponseEntity.ok("Deleted dividend payment");
+        return ResponseEntity.noContent().build();
     }
     
     

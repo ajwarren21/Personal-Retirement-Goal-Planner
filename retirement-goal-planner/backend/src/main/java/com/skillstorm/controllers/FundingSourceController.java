@@ -70,9 +70,10 @@ public class FundingSourceController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id, Principal principal) {
+    public ResponseEntity<Void> delete(@PathVariable long id, Principal principal) {
         service.deleteFundingSourceForUser(id, principal.getName());
-        return ResponseEntity.ok("Deleted Funding Source Successfully");
+        return ResponseEntity.noContent().build();
+
     }
     
 
