@@ -1,0 +1,8 @@
+:host {
+  display: block;
+}
+
+p-card {
+  --surface-color: white;
+  --surface-border: 1px solid #e5e7eb;
+}

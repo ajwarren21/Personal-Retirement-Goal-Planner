@@ -1,0 +1,224 @@
+<div class="dashboard">
+
+    <div class="dash-header">
+        <div>
+            <h1 class="dash-title">Retirement Dashboard</h1>
+            <p class="dash-subtitle">Your goals, funding sources, and contributions at a glance</p>
+        </div>
+    </div>
+
+    <!-- Loading state -->
+    @if (loading) {
+        <div class="dash-state">
+            <p-progress-spinner strokeWidth="4" />
+        </div>
+    }
+
+    <!-- Error state -->
+    @if (error) {
+        <div class="dash-state dash-error">
+            {{ error }}
+        </div>
+    }
+
+    @if (!loading && !error) {
+
+        <!-- Summary stat cards -->
+        <div class="summary-grid">
+
+            <p-card class="stat-card">
+                <div class="stat-row">
+                    <div class="stat-icon stat-icon-goals">
+                        <i class="pi pi-flag"></i>
+                    </div>
+                    <div class="stat-body">
+                        <p class="stat-label">Goals</p>
+                        <h1 class="stat-value">{{ goalCount }}</h1>
+                    </div>
+                </div>
+            </p-card>
+
+            <p-card class="stat-card">
+                <div class="stat-row">
+                    <div class="stat-icon stat-icon-sources">
+                        <i class="pi pi-building-columns"></i>
+                    </div>
+                    <div class="stat-body">
+                        <p class="stat-label">Funding Sources</p>
+                        <h1 class="stat-value">{{ fundingSourceCount }}</h1>
+                    </div>
+                </div>
+            </p-card>
+
+            <p-card class="stat-card">
+                <div class="stat-row">
+                    <div class="stat-icon stat-icon-target">
+                        <i class="pi pi-bullseye"></i>
+                    </div>
+                    <div class="stat-body">
+                        <p class="stat-label">Total Target</p>
+                        <h2 class="stat-value">{{ totalTargetAmount | currency }}</h2>
+                    </div>
+                </div>
+            </p-card>
+
+            <p-card class="stat-card">
+                <div class="stat-row">
+                    <div class="stat-icon stat-icon-contributed">
+                        <i class="pi pi-wallet"></i>
+                    </div>
+                    <div class="stat-body">
+                        <p class="stat-label">Total Contributed</p>
+                        <h2 class="stat-value">{{ totalContributed | currency }}</h2>
+                    </div>
+                </div>
+            </p-card>
+
+        </div>
+
+        <!-- Overall progress banner -->
+        <p-card class="overall-card">
+            <div class="overall-row">
+                <div class="overall-info">
+                    <p class="overall-label">Overall progress toward your combined target</p>
+                    <p class="overall-numbers">
+                        <strong>{{ totalContributed | currency }}</strong> of {{ totalTargetAmount | currency }}
+                        <span class="overall-percent">({{ overallProgress() }}%)</span>
+                    </p>
+                </div>
+                <div class="overall-bar">
+                    <p-progressbar [value]="overallProgress()" [showValue]="false"></p-progressbar>
+                </div>
+            </div>
+        </p-card>
+
+        <!-- Retirement Goals -->
+        <div class="section">
+
+            <div class="section-header">
+                <h2>Retirement Goals</h2>
+                <button
+                    pButton
+                    label="View All"
+                    icon="pi pi-arrow-right"
+                    iconPos="right"
+                    class="p-button-text p-button-sm"
+                    [routerLink]="['/retirement-goals']">
+                </button>
+            </div>
+
+            @if (goals.length > 0) {
+                <div class="list-grid">
+                    @for (goal of goals; track goal.id) {
+                        <p-card class="list-card">
+
+                            <div class="list-card-body">
+
+                                <div class="list-card-top">
+                                    <div>
+                                        <h3 class="list-card-title">{{ goal.name }}</h3>
+                                        <p class="list-card-meta">Retirement age {{ goal.targetRetirementAge }}</p>
+                                    </div>
+                                    <button
+                                        pButton
+                                        label="View"
+                                        class="p-button-sm p-button-outlined"
+                                        [routerLink]="['/retirement-goals']">
+                                    </button>
+                                </div>
+
+                                <p class="list-card-amounts">
+                                    <strong>{{ goalContributed(goal) | currency }}</strong>
+                                    of {{ goal.targetAmount | currency }} target
+                                </p>
+
+                                <p-progressbar
+                                    [value]="goalProgress(goal)"
+                                    [showValue]="false">
+                                </p-progressbar>
+
+                            </div>
+
+                        </p-card>
+                    }
+                </div>
+            } @else {
+                <div class="empty-state">
+                    <i class="pi pi-flag empty-state-icon"></i>
+                    <p>No retirement goals yet.</p>
+                    <button
+                        pButton
+                        label="Create a Goal"
+                        icon="pi pi-plus"
+                        class="p-button-sm"
+                        [routerLink]="['/retirement-goals']">
+                    </button>
+                </div>
+            }
+
+        </div>
+
+        <!-- Funding Sources -->
+        <div class="section">
+
+            <div class="section-header">
+                <h2>Funding Sources</h2>
+                <button
+                    pButton
+                    label="View All"
+                    icon="pi pi-arrow-right"
+                    iconPos="right"
+                    class="p-button-text p-button-sm"
+                    [routerLink]="['/funding-sources']">
+                </button>
+            </div>
+
+            @if (fundingSources.length > 0) {
+                <div class="list-grid">
+                    @for (source of fundingSources; track source.id) {
+                        <p-card styleClass="list-card">
+
+                            <div class="list-card-body">
+
+                                <div class="list-card-top">
+                                    <div>
+                                        <h3 class="list-card-title">{{ source.name }}</h3>
+                                        <p class="list-card-meta">{{ source.institution }}</p>
+                                    </div>
+                                    <button
+                                        pButton
+                                        label="View"
+                                        class="p-button-sm p-button-outlined"
+                                        [routerLink]="['/funding-sources']">
+                                    </button>
+                                </div>
+
+                                <p-tag
+                                    [value]="source.sourceType"
+                                    severity="info">
+                                </p-tag>
+
+                            </div>
+
+                        </p-card>
+                    }
+                </div>
+            } @else {
+                <div class="empty-state">
+                    <i class="pi pi-building-columns empty-state-icon"></i>
+                    <p>No funding sources yet.</p>
+                    <button
+                        pButton
+                        label="Add a Funding Source"
+                        icon="pi pi-plus"
+                        class="p-button-sm"
+                        [routerLink]="['/funding-sources']">
+                    </button>
+                </div>
+            }
+
+        </div>
+
+    }
+
+</div>

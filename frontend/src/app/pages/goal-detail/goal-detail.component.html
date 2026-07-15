@@ -1,0 +1,322 @@
+<div class="p-6 max-w-6xl mx-auto">
+
+  <!-- Header with back button -->
+  <div class="mb-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button
+        pButton
+        icon="pi pi-arrow-left"
+        class="p-button-text p-button-sm"
+        (click)="goBack()">
+      </button>
+      <div>
+        @if (!loading()) {
+          <h1 class="text-2xl font-semibold text-gray-800">{{ goal()?.name }}</h1>
+          <p class="text-gray-500 text-sm mt-1">Goal Details & Contributions</p>
+        }
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button
+        pButton
+        icon="pi pi-pencil"
+        label="Edit"
+        class="p-button-sm p-button-secondary"
+        (click)="handleEditGoal()"
+        [disabled]="!goal()">
+      </button>
+      <button
+        pButton
+        icon="pi pi-trash"
+        label="Delete"
+        class="p-button-sm p-button-danger"
+        (click)="handleDeleteGoal()"
+        [disabled]="!goal()">
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="flex justify-center items-center h-48">
+      <p-progress-spinner strokeWidth="4" />
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (error()) {
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!loading() && !error() && goal()) {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+      <!-- Goal Summary Card -->
+      <p-card class="shadow-md">
+        <ng-template pTemplate="header">
+          <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-32 flex items-center justify-center text-white text-2xl font-bold">
+            Target Amount
+          </div>
+        </ng-template>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-blue-600">{{ goal()!.targetAmount | currency }}</div>
+          <p class="text-gray-500 text-sm mt-2">Target retirement nest egg</p>
+        </div>
+      </p-card>
+
+      <!-- Total Contributed Card -->
+      <p-card class="shadow-md">
+        <ng-template pTemplate="header">
+          <div class="bg-gradient-to-r from-green-500 to-green-600 h-32 flex items-center justify-center text-white text-2xl font-bold">
+            Contributed
+          </div>
+        </ng-template>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-600">{{ totalContributed() | currency }}</div>
+          <p class="text-gray-500 text-sm mt-2">Total deposited to date</p>
+        </div>
+      </p-card>
+
+      <!-- Progress Card -->
+      <p-card class="shadow-md">
+        <ng-template pTemplate="header">
+          <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-32 flex items-center justify-center text-white text-2xl font-bold">
+            Progress
+          </div>
+        </ng-template>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-purple-600">{{ percentageComplete() | number:'1.0-0' }}%</div>
+          <p class="text-gray-500 text-sm mt-2">Of target amount</p>
+        </div>
+      </p-card>
+
+    </div>
+
+    <!-- Goal Details Section -->
+    <p-card class="shadow-md mb-6">
+      <ng-template pTemplate="header">
+        <div class="bg-gray-100 px-4 py-3 font-semibold text-gray-800">Goal Details</div>
+      </ng-template>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-600 font-medium">Target Retirement Age</p>
+          <p class="text-lg font-semibold text-gray-800">{{ goal()!.targetRetirementAge }} years old</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600 font-medium">Years to Retirement</p>
+          <p class="text-lg font-semibold text-gray-800">~{{ yearsToRetirement() }} years</p>
+        </div>
+      </div>
+      @if (goal()!.notes) {
+        <div class="mt-4 pt-4 border-t">
+          <p class="text-sm text-gray-600 font-medium">Notes</p>
+          <p class="text-gray-700 mt-1">{{ goal()!.notes }}</p>
+        </div>
+      }
+    </p-card>
+
+    <!-- Contributions Section -->
+    <p-card class="shadow-md">
+      <ng-template pTemplate="header">
+        <div class="bg-gray-100 px-4 py-3 font-semibold text-gray-800 flex justify-between items-center">
+          <span>Contributions to This Goal</span>
+          <button
+            pButton
+            label="Add Contribution"
+            icon="pi pi-plus"
+            class="p-button-sm"
+            (click)="handleAddContribution()">
+          </button>
+        </div>
+      </ng-template>
+
+      @if (goal()!.contributions && goal()!.contributions.length > 0) {
+        <p-table [value]="goal()!.contributions" responsiveLayout="scroll" styleClass="p-datatable-striped">
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="fundingSource.name">Funding Source <p-sortIcon field="fundingSource.name" /></th>
+              <th pSortableColumn="amount">Amount <p-sortIcon field="amount" /></th>
+              <th pSortableColumn="contributionDate">Date <p-sortIcon field="contributionDate" /></th>
+              <th pSortableColumn="category">Category <p-sortIcon field="category" /></th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-contribution>
+            <tr>
+              <td class="font-medium">
+                <a
+                  [routerLink]="['/funding-sources', contribution.fundingSource?.id ?? contribution.fundingSourceId]"
+                  class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                  {{ contribution.fundingSource?.name || contribution.fundingSourceName }}
+                </a>
+              </td>
+              <td>{{ contribution.amount | currency }}</td>
+              <td>{{ contribution.contributionDate }}</td>
+              <td>
+                <p-tag
+                  [value]="contribution.category"
+                  [severity]="contribution.category === 'EMPLOYER_MATCH' ? 'success' : (contribution.category === 'ROLLOVER' ? 'info' : 'secondary')">
+                </p-tag>
+              </td>
+              <td class="text-gray-500 text-sm">{{ contribution.notes || '—' }}</td>
+              <td>
+                <div class="flex gap-1">
+                  <button
+                    pButton
+                    icon="pi pi-pencil"
+                    class="p-button-sm p-button-text p-button-secondary"
+                    (click)="handleEditContribution(contribution)">
+                  </button>
+                  <button
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-sm p-button-text p-button-danger"
+                    (click)="deleteContribution(contribution)">
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      } @else {
+        <div class="text-center text-gray-500 py-8">
+          <p class="text-sm italic">No contributions logged yet for this goal.</p>
+        </div>
+      }
+
+    </p-card>
+  }
+
+  <!-- Edit Goal Dialog -->
+  <p-dialog
+    header="Edit Retirement Goal"
+    [(visible)]="showEditDialog"
+    [modal]="true"
+    [style]="{ width: '28rem' }"
+    [draggable]="false"
+    [focusOnShow]="false">
+
+    <form [formGroup]="editForm" (ngSubmit)="saveGoal()" class="flex flex-col gap-4 pt-2">
+
+      <p-iftalabel>
+        <input pInputText id="name" formControlName="name" class="w-full" />
+        <label for="name">Name</label>
+      </p-iftalabel>
+      @if (editForm.get('name')?.invalid && editForm.get('name')?.touched) {
+        <span class="text-red-500 text-xs -mt-2">Name must be at least 2 characters</span>
+      }
+
+      <div class="flex flex-col gap-1">
+        <label for="targetRetirementAge" class="font-medium">Target Retirement Age</label>
+        <p-inputNumber
+          inputId="targetRetirementAge"
+          formControlName="targetRetirementAge"
+          [useGrouping]="false"
+          styleClass="w-full">
+        </p-inputNumber>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="targetAmount" class="font-medium">Target Amount</label>
+        <p-inputNumber
+          inputId="targetAmount"
+          formControlName="targetAmount"
+          mode="currency"
+          currency="USD"
+          locale="en-US"
+          styleClass="w-full">
+        </p-inputNumber>
+      </div>
+
+      <p-iftalabel>
+        <textarea pTextarea id="notes" formControlName="notes" rows="3" class="w-full"></textarea>
+        <label for="notes">Notes</label>
+      </p-iftalabel>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button pButton type="button" label="Cancel" class="p-button-text p-button-sm" (click)="showEditDialog.set(false)"></button>
+        <button pButton type="submit" label="Save" icon="pi pi-check" class="p-button-sm"></button>
+      </div>
+
+    </form>
+
+  </p-dialog>
+
+  <!-- Add/Edit Contribution Dialog -->
+  <p-dialog
+    [header]="selectedContribution() ? 'Update Contribution' : 'Add Contribution'"
+    [(visible)]="showContributionDialog"
+    [modal]="true"
+    [style]="{ width: '28rem' }"
+    [draggable]="false"
+    [focusOnShow]="false">
+
+    <form [formGroup]="contributionForm" (ngSubmit)="saveContribution()" class="flex flex-col gap-4 pt-2">
+
+      <div class="flex flex-col gap-1">
+        <label for="fundingSourceId" class="font-medium">Funding Source</label>
+        <p-select
+          inputId="fundingSourceId"
+          formControlName="fundingSourceId"
+          [options]="fundingSources()"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select a funding source"
+          styleClass="w-full">
+        </p-select>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="amount" class="font-medium">Amount</label>
+        <p-inputNumber
+          inputId="amount"
+          formControlName="amount"
+          mode="currency"
+          currency="USD"
+          locale="en-US"
+          styleClass="w-full">
+        </p-inputNumber>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="contributionDate" class="font-medium">Contribution Date</label>
+        <input
+          pInputText
+          type="date"
+          id="contributionDate"
+          formControlName="contributionDate"
+          class="w-full" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="category" class="font-medium">Category</label>
+        <p-select
+          inputId="category"
+          formControlName="category"
+          [options]="categoryOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select a category"
+          styleClass="w-full">
+        </p-select>
+      </div>
+
+      <p-iftalabel>
+        <textarea pTextarea id="contributionNotes" formControlName="notes" rows="2" class="w-full"></textarea>
+        <label for="contributionNotes">Notes</label>
+      </p-iftalabel>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button pButton type="button" label="Cancel" class="p-button-text p-button-sm" (click)="showContributionDialog.set(false)"></button>
+        <button pButton type="submit" label="Save" icon="pi pi-check" class="p-button-sm"></button>
+      </div>
+
+    </form>
+
+  </p-dialog>
+
+</div>

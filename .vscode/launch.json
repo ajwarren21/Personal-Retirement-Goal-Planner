@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-RetirementGoalPlannerApplication<retirement-goal-planner>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/retirement-goal-planner/backend",
+            "mainClass": "com.skillstorm.RetirementGoalPlannerApplication",
+            "projectName": "retirement-goal-planner",
+            "args": "",
+            "envFile": "${workspaceFolder}/retirement-goal-planner/backend/.env"
+        }
+    ]
+}
