@@ -216,3 +216,24 @@
   flex-wrap: wrap;
 }
 
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.2rem;
+    color: var(--text-color);
+    transition: background-color 0.2s;
+    z-index: 10;
+}
+

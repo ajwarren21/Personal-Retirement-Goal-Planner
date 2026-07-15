@@ -5,13 +5,13 @@ import { AuthService } from '../../services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 
-import { ProfileComponent } from '../profile/profile.component';
+// import { ProfileComponent } from '../profile/profile.component';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule, ButtonModule, DialogModule, ProfileComponent],
+  imports: [ReactiveFormsModule, FormsModule, ButtonModule, DialogModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
