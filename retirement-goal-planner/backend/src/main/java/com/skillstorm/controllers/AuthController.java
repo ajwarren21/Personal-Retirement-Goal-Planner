@@ -50,16 +50,18 @@ public class AuthController {
         return ResponseEntity.ok(body);
     }
 
+    private ResponseUserDto toResponseDto(User user) {
+    return new ResponseUserDto(user.getId(), user.getUsername(), user.getEmail());
+    }
+
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerNewUser(@Valid @RequestBody UserDto registeringUser) {
-    
-        User createdUser = userService.register(registeringUser);
-        if(createdUser == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    public ResponseEntity<ResponseUserDto> registerNewUser(@Valid @RequestBody UserDto registeringUser) {   
+    User createdUser = userService.register(registeringUser);
+    if(createdUser == null) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
+    return new ResponseEntity<>(toResponseDto(createdUser), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
@@ -67,7 +69,7 @@ public class AuthController {
         // If the security filter already authenticated the request (e.g., via Basic), principal will be present
         if (principal != null) {
             User loggedInUser = userService.getUserByUsername(principal.getName());
-            return ResponseEntity.ok(loggedInUser);
+            return ResponseEntity.ok(toResponseDto(loggedInUser));
         }
 
         // Otherwise attempt manual authentication using Authorization header (Basic)
@@ -91,7 +93,7 @@ public class AuthController {
             request.getSession(true);
 
             User loggedInUser = userService.getUserByUsername(username);
-            return ResponseEntity.ok(loggedInUser);
+            return ResponseEntity.ok(toResponseDto(loggedInUser));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }

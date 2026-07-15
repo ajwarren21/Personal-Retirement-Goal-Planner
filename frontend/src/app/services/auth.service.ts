@@ -5,23 +5,23 @@ import { LoginRequest } from '../types/login-request';
 import { environment } from '../../environments/environments';
 import { Router } from '@angular/router';
 import { User } from '../types/user';
+import { CsrfService } from "./csrf-service";
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
   private readonly URL = `${environment.baseApiUrl}`;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router, private csrfService: CsrfService) {}
 
-  initCsrf(): Observable<any> {
-    return this.http.get<any>(`${this.URL}api/auth/csrf`, { withCredentials: true })
-      .pipe(
-        tap(res => {
-          if (res && res.token) {
-          }
-        })
-      );
-  }
+  // initCsrf(): Observable<any> {
+  //   return this.http.get<any>(`${this.URL}api/auth/csrf`, { withCredentials: true })
+  //     .pipe(
+  //       tap(res => {
+  //         this.csrfService.setToken(res.headerName, res.token)
+  //       })
+  //     );
+  // }
 
   login(credentials: LoginRequest): Observable<any> {
     const authHeader = 'Basic ' + btoa(`${credentials.username}:${credentials.password}`);

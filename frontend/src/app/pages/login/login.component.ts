@@ -32,10 +32,10 @@ export class LoginComponent {
   
   ngOnInit(): void {
    
-    this.authService.initCsrf().subscribe({
-    next: () => console.log('CSRF Token initialized successfully'),
-    error: (err) => console.error('Failed to initialize CSRF', err)
-    });
+    // this.authService.initCsrf().subscribe({
+    // next: () => console.log('CSRF Token initialized successfully'),
+    // error: (err) => console.error('Failed to initialize CSRF', err)
+    // });
 
    
     this.form = this.formBuilder.group({
