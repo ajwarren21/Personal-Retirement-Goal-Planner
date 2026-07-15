@@ -10,6 +10,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -60,37 +61,30 @@ public class SecurityConfig {
         return source;
     }
 
+        
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            .cors(Customizer.withDefaults()) 
-            .authorizeHttpRequests(auth -> 
+            .cors(Customizer.withDefaults())
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth ->
                 auth
                     .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .anyRequest().authenticated()
             )
-            .csrf(csrf -> 
-                csrf
-                
-                    .ignoringRequestMatchers(
-            "/api/auth/login",
-                        "/api/auth/register",
-                        "/api/auth/csrf")
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                    .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-            )
-
             .httpBasic(httpBasic ->
                 httpBasic.authenticationEntryPoint((request, response, authException) -> {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 })
-            );            
-                    return http.build();
+            );
 
-                }
+        return http.build();
+}
 
 }
