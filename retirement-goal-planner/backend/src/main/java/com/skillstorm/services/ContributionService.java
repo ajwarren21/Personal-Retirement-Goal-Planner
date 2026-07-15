@@ -67,14 +67,14 @@ public class ContributionService {
         return mapper.toDto(c);
     }
 
-    public ResponseContributionDto update(long id, ContributionDto dto) {
-        Contribution c = repo.findById(id).orElseThrow(() -> new ContributionNotFoundException(id));
+    // public ResponseContributionDto update(long id, ContributionDto dto) {
+    //     Contribution c = repo.findById(id).orElseThrow(() -> new ContributionNotFoundException(id));
  
-        mapper.updateEntityFromDto(dto, c);
+    //     mapper.updateEntityFromDto(dto, c);
  
-        repo.save(c);
-        return mapper.toDto(c);
-    }
+    //     repo.save(c);
+    //     return mapper.toDto(c);
+    // }
 
     /**
      * Update a contribution with user ownership verification.
@@ -127,7 +127,7 @@ public class ContributionService {
 
     public void delete(long id) {
         Contribution c = repo.findById(id).orElseThrow(() -> new ContributionNotFoundException(id));
-        repo.delete(c);
+        repo.deleteById(id);
     }
 
     /**
@@ -143,7 +143,7 @@ public class ContributionService {
             throw new ContributionNotFoundException(id);
         }
         
-        repo.delete(c);
+        repo.deleteById(id);
     }
     
 

@@ -1,126 +1,148 @@
-// package com.skillstorm.controllers;
+package com.skillstorm.controllers;
 
-// import static org.mockito.ArgumentMatchers.*;
-// import static org.mockito.Mockito.*;
-// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// import java.math.BigDecimal;
-// import java.time.LocalDate;
-// import java.util.List;
+import java.math.BigDecimal;
+import java.security.Principal;
+import java.time.LocalDate;
 
-// import com.fasterxml.jackson.databind.ObjectMapper;
-// import com.skillstorm.dtos.ResponseContributionDto;
-// import com.skillstorm.enums.ContributionCategory;
-// import com.skillstorm.dtos.ContributionDto;
-// // import com.skillstorm.models.Contribution;
-// import com.skillstorm.models.FundingSource;
-// import com.skillstorm.models.RetirementGoal;
-// import com.skillstorm.models.User;
-// import com.skillstorm.services.ContributionService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-// import org.springframework.http.MediaType;
-// import org.springframework.test.context.bean.override.mockito.MockitoBean;
-// import org.springframework.test.web.servlet.MockMvc;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.skillstorm.dtos.ContributionDto;
+import com.skillstorm.dtos.ResponseContributionDto;
+import com.skillstorm.enums.ContributionCategory;
+import com.skillstorm.services.ContributionService;
 
-// @WebMvcTest(ContributionController.class)
-// class ContributionControllerTest {
+@WebMvcTest(ContributionController.class)
+class ContributionControllerTest {
 
-//     @Autowired
-//     private MockMvc mockMvc;
+    private static final String USERNAME = "testuser";
 
-//     @MockitoBean
-//     private ContributionService service;
+    private static final Principal PRINCIPAL = () -> USERNAME;
 
-//     @Autowired
-//     private ObjectMapper objectMapper;
+    @Autowired
+    private MockMvc mockMvc;
 
-//     private User user;
-//     private RetirementGoal goal;
-//     private FundingSource source;
-//     private ContributionDto requestDto;
-//     private ResponseContributionDto responseDto;
+    @MockitoBean
+    private ContributionService service;
 
-//     @BeforeEach
-//     void setUp() {
-//         user = new User();
-//         goal = new RetirementGoal();
-//         goal.setId(1L);
-//         source = new FundingSource();
-//         source.setId(2L);
-//         // long id,
-//         // User user,
-//         // RetirementGoal goal,
-//         // FundingSource fundingSource,
-//         // BigDecimal amount,
-//         // LocalDate contributionDate,
-//         // ContributionCategory category,
-//         // String notes
+    @Autowired
+    private ObjectMapper objectMapper;
 
-//         requestDto = new ContributionDto(
-//             user,
-//             goal.getId(),
-//             source.getId(),
-//             BigDecimal.valueOf(5000),
-//             LocalDate.now(),
-//             ContributionCategory.CATCH_UP_CONTRIBUTION, 
-//             "notes"
-//         );
+    private ContributionDto dto;
+    private ResponseContributionDto responseDto;
 
-//         responseDto = mock(ResponseContributionDto.class);
-//     }
+    @BeforeEach
+    void setUp() {
 
+        dto = new ContributionDto(
+            1L, // retirementGoalId
+            2L, // fundingSourceId
+            BigDecimal.valueOf(5000),
+            LocalDate.now(),
+            ContributionCategory.CATCH_UP_CONTRIBUTION,
+            "notes"
+        );
 
-//     @Test
-//     void getAll_ShouldReturn200() throws Exception {
-//         when(service.getAll()).thenReturn(List.of(responseDto));
+//           long id,
+//     long retirementGoalId,
+//     String retirementGoalName,
+//     long fundingSourceId,
+//     String fundingSourceName,
+//     java.math.BigDecimal amount,
+//     java.time.LocalDate contributionDate,
+//     com.skillstorm.enums.ContributionCategory category,
+//     String notes
+// ) {}
 
-//         mockMvc.perform(get("/goals"))
-//                 .andExpect(status().isOk());
-//     }
+        responseDto = new ResponseContributionDto(
+            1L,
+            1L,
+            "goal",
+            2L,
+            "source",
+            BigDecimal.valueOf(5000),
+            LocalDate.now(),
+            ContributionCategory.CATCH_UP_CONTRIBUTION,
+            "notes"
+        );
+    }
 
+    @Test
+    @WithMockUser(username = USERNAME)
+    void getAll_ShouldReturn200() throws Exception {
 
-//     @Test
-//     void getById_ShouldReturn200() throws Exception {
-//         when(service.getById(1L)).thenReturn(responseDto);
+        when(service.getContributionsByUser(USERNAME))
+                .thenReturn(java.util.List.of(responseDto));
 
-//         mockMvc.perform(get("/goals/1"))
-//                 .andExpect(status().isOk());
-//     }
+        mockMvc.perform(get("/contributions").principal(PRINCIPAL))
+                .andExpect(status().isOk());
+    }
 
+    @Test
+    @WithMockUser(username = USERNAME)
+    void getById_ShouldReturn200() throws Exception {
 
-//     @Test
-//     void create_ShouldReturn201() throws Exception {
-//         when(service.create(any(ContributionDto.class))).thenReturn(responseDto);
+        when(service.getByIdForUser(1L, USERNAME))
+                .thenReturn(responseDto);
 
-//         mockMvc.perform(post("/goals")
-//                 .contentType(MediaType.APPLICATION_JSON)
-//                 .content(objectMapper.writeValueAsString(requestDto)))
-//                 .andExpect(status().isCreated());
-//     }
+        mockMvc.perform(get("/contributions/1").principal(PRINCIPAL))
+                .andExpect(status().isOk());
+    }
 
+    @Test
+    @WithMockUser(username = USERNAME)
+    void create_ShouldReturn201() throws Exception {
 
-//     @Test
-//     void update_ShouldReturn200() throws Exception {
-//         when(service.update(eq(1L), any(ContributionDto.class))).thenReturn(responseDto);
+        when(service.createContributionForUser(any(ContributionDto.class), eq(USERNAME)))
+                .thenReturn(responseDto);
 
-//         mockMvc.perform(put("/goals/1")
-//                 .contentType(MediaType.APPLICATION_JSON)
-//                 .content(objectMapper.writeValueAsString(requestDto)))
-//                 .andExpect(status().isOk());
-//     }
+        mockMvc.perform(post("/contributions")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated());
+    }
 
+    @Test
+    @WithMockUser(username = USERNAME)
+    void update_ShouldReturn200() throws Exception {
 
-//     @Test
-//     void delete_ShouldReturn200WithMessage() throws Exception {
-//         doNothing().when(service).delete(1L);
+        when(service.updateForUser(eq(1L), any(ContributionDto.class), eq(USERNAME)))
+                .thenReturn(responseDto);
 
-//         mockMvc.perform(delete("/goals/1"))
-//                 .andExpect(status().isOk())
-//                 .andExpect(content().string("Deleted dividend payment"));
-//     }
-// }
+        mockMvc.perform(put("/contributions/1")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = USERNAME)
+    void delete_ShouldReturn204() throws Exception {
+
+        doNothing().when(service).deleteForUser(1L, USERNAME);
+
+        mockMvc.perform(delete("/contributions/1")
+                .with(csrf()))
+                .andExpect(status().isOk());
+    }
+}
