@@ -105,9 +105,9 @@ public class RetirementGoalService {
         return mapper.toDto(r);
     }
 
-    public void delete(long id) {
+    public void deleteRetirementGoal(long id) {
         RetirementGoal r = repo.findById(id).orElseThrow(() -> new GoalNotFoundException(id));
-        repo.delete(r);
+        repo.deleteById(id);
     }
 
     /**
@@ -123,7 +123,7 @@ public class RetirementGoalService {
             throw new GoalNotFoundException(id);
         }
         
-        repo.delete(r);
+        repo.deleteById(id);
     }
 
 

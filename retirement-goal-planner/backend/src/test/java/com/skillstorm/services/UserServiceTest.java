@@ -1,169 +1,327 @@
-// package com.skillstorm.services;
+package com.skillstorm.services;
 
-// import static org.junit.jupiter.api.Assertions.assertEquals;
-// import static org.junit.jupiter.api.Assertions.assertFalse;
-// import static org.junit.jupiter.api.Assertions.assertThrows;
-// import static org.mockito.ArgumentMatchers.any;
-// import static org.mockito.Mockito.doNothing;
-// import static org.mockito.Mockito.mock;
-// import static org.mockito.Mockito.never;
-// import static org.mockito.Mockito.times;
-// import static org.mockito.Mockito.verify;
-// import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-// import java.util.List;
-// import java.util.Optional;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
-// import org.junit.jupiter.api.extension.ExtendWith;
-// import org.mockito.InjectMocks;
-// import org.mockito.Mock;
-// import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-// import com.skillstorm.dtos.ResponseUserDto;
-// import com.skillstorm.dtos.UserDto;
-// import com.skillstorm.exceptions.UserNotFoundException;
-// import com.skillstorm.mappers.UserMapper;
-// import com.skillstorm.models.User;
-// import com.skillstorm.repositories.UserRepository;
+import com.skillstorm.dtos.ResponseUserDto;
+import com.skillstorm.dtos.UpdateUserDto;
+import com.skillstorm.dtos.UserDto;
+import com.skillstorm.models.Role;
+import com.skillstorm.models.User;
+import com.skillstorm.repositories.RoleRepository;
+import com.skillstorm.repositories.UserRepository;
 
-// @ExtendWith(MockitoExtension.class)
-// public class UserServiceTest {
+@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
 
-//     @Mock
-//     private UserRepository repo;
+    @Mock
+    private UserRepository userRepository;
 
-//     @Mock
-//     private UserMapper mapper;
+    @Mock
+    private RoleRepository roleRepository;
 
-//     @InjectMocks
-//     private UserService service;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
-//     private User user;
-//     private UserDto userDto;
-//     private ResponseUserDto responseUserDto;
+    @InjectMocks
+    private UserService service;
 
-//     // Runs before each test - sets up the test data
-//     @BeforeEach
-//     void setUp() {
-//         user = new User();
-//         user.setId(1L);
-//         user.setUsername("gagetest");
-//         user.setPassword("password");
-//         user.setEmail("gage@test.com");
+    private User user;
+    private Role role;
 
-//         userDto = mock(UserDto.class);
-//         responseUserDto = mock(ResponseUserDto.class);
+    @BeforeEach
+    void setUp() {
 
-//     }
+        role = new Role();
+        role.setId(1);
+        // role.setId(0);
+        role.setName("USER");
 
+        user = new User();
+        user.setId(1L);
+        user.setUsername("gagetest");
+        user.setPassword("encodedPassword");
+        user.setEmail("gage@test.com");
+        user.setEnabled(true);
+        user.setRoles(Set.of(role));
+    }
 
-//     @Test
-//     void getAllReturnsListOfDtos() {
-//         when(repo.findAll()).thenReturn(List.of(user));
+    /**
+     * loadUserByUsername
+     */
 
-//         when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
+    @Test
+    void loadUserByUsernameReturnsUserDetails() {
 
-//         Iterable<ResponseUserDto> result = service.getAll();
+        when(userRepository.findByUsername("gagetest"))
+                .thenReturn(Optional.of(user));
 
+        UserDetails result = service.loadUserByUsername("gagetest");
 
-//         assertEquals(List.of(responseUserDto), result);
+        assertEquals("gagetest", result.getUsername());
+        assertEquals("encodedPassword", result.getPassword());
+        assertTrue(result.isEnabled());
+        assertTrue(
+                result.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_USER")));
 
-//         verify(repo, times(1)).findAll();
-//     }
+        verify(userRepository).findByUsername("gagetest");
+    }
 
-//     @Test
-//     void getAllReturnsEmptyWhenNoUsersFound() {
-//         when(repo.findAll()).thenReturn(List.of());
+    @Test
+    void loadUserByUsernameThrowsWhenUserNotFound() {
 
-//         Iterable<ResponseUserDto> result = service.getAll();
+        when(userRepository.findByUsername("missing"))
+                .thenReturn(Optional.empty());
 
-//         assertFalse(result.iterator().hasNext());
-//     }
+        assertThrows(
+                UsernameNotFoundException.class,
+                () -> service.loadUserByUsername("missing"));
 
-//     @Test
-//     void getByIdReturnsResponseDto() {
-//         when(repo.findById(1L)).thenReturn(Optional.of(user));
-//         when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
+        verify(userRepository).findByUsername("missing");
+    }
 
-//         ResponseUserDto result = service.getById(1L);
+    /**
+     * register
+     */
 
-//         assertEquals(responseUserDto, result);
+    @Test
+    void registerCreatesUser() {
 
-//         verify(repo, times(1)).findById(1l);
-//     }
+        UserDto dto = new UserDto(
+            "new@test.com",
+            "password",
+            "newuser");
 
-//     @Test
-//     void getByIdThrowsExceptionWhenNotFound() {
-//         when(repo.findById(200L)).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("newuser"))
+                .thenReturn(false);
 
-//         assertThrows(UserNotFoundException.class, () -> service.getById(200L));
-//     }
+        when(roleRepository.findByName("USER"))
+                .thenReturn(Optional.of(role));
 
-//     @Test
-//     void createAndReturnsResponseDto() {
-//         when(mapper.toEntity(userDto)).thenReturn(user);
-//         when(repo.save(user)).thenReturn(user);
-//         when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
+        when(passwordEncoder.encode("password"))
+                .thenReturn("encodedPassword");
 
-//         ResponseUserDto result = service.create(userDto);
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(i -> i.getArgument(0));
 
-//         assertEquals(responseUserDto, result);
+        User result = service.register(dto);
 
-//         verify(repo, times(1)).save(user);
+        assertNotNull(result);
+        assertEquals("newuser", result.getUsername());
+        assertEquals("encodedPassword", result.getPassword());
+        assertEquals("new@test.com", result.getEmail());
+        assertTrue(result.isEnabled());
+        assertEquals(Set.of(role), result.getRoles());
 
-//     }
+        verify(userRepository).save(any(User.class));
+    }
 
-//     @Test
-//     void updateAndReturnsDto() {
-//         when(repo.findById(1L)).thenReturn(Optional.of(user));
+    @Test
+    void registerReturnsNullWhenUsernameExists() {
 
-//         doNothing().when(mapper).updateEntityFromDto(userDto, user);
+        UserDto dto = new UserDto(
+            "test@test.com",
+            "password",
+                "gagetest");
 
-//         when(repo.save(user)).thenReturn(user);
+        when(userRepository.existsByUsername("gagetest"))
+                .thenReturn(true);
 
-//         when(mapper.toResponseDto(user)).thenReturn(responseUserDto);
+        User result = service.register(dto);
 
-//         ResponseUserDto result = service.update(1L, userDto);
+        assertNull(result);
 
-//         assertEquals(responseUserDto, result);
+        verify(userRepository, never()).save(any());
+        verify(roleRepository, never()).findByName(anyString());
+    }
 
-//         verify(mapper, times(1)).updateEntityFromDto(userDto, user);
+    @Test
+    void registerCreatesRoleIfMissing() {
 
-//         verify(repo, times(1)).save(user);
-//     }
+        UserDto dto = new UserDto(
+            "new@test.com",
+            "password",
+            "newuser");
 
-//     @Test
-//     void updateThrowsExceptionWhenNotFound() {
-//         when(repo.findById(200l)).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("newuser"))
+                .thenReturn(false);
 
-//         assertThrows(UserNotFoundException.class, () -> service.update(200L, userDto));
+        when(roleRepository.findByName("USER"))
+                .thenReturn(Optional.empty());
 
-//         verify(repo, never()).save(any());
-//     }
+        when(roleRepository.save(any(Role.class)))
+                .thenReturn(role);
 
-//     @Test
-//     void deleteDeletesUser() {
+        when(passwordEncoder.encode("password"))
+                .thenReturn("encodedPassword");
 
-//         when(repo.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(i -> i.getArgument(0));
 
-//         service.delete(1L);
+        User result = service.register(dto);
 
-//         verify(repo, times(1)).delete(user);
+        assertNotNull(result);
 
-//     }
-    
-//     @Test
-//     void deleteThrowsExceptionWhenNotFound() {
+        verify(roleRepository).save(any(Role.class));
+        verify(userRepository).save(any(User.class));
+    }
 
-//         when(repo.findById(200L)).thenReturn(Optional.empty());
+    /**
+     * getAllUsers
+     */
 
-//         assertThrows(UserNotFoundException.class, () -> service.delete(200L));
+    @Test
+    void getAllUsersReturnsUsers() {
 
-//         verify(repo, never()).delete(any());
-//     }
-    
+        when(userRepository.findAll())
+                .thenReturn(List.of(user));
 
+        List<User> result = service.getAllUsers();
 
-// }
+        assertEquals(1, result.size());
+        assertEquals(user, result.get(0));
+
+        verify(userRepository).findAll();
+    }
+
+    @Test
+    void getAllUsersReturnsEmptyList() {
+
+        when(userRepository.findAll())
+                .thenReturn(List.of());
+
+        List<User> result = service.getAllUsers();
+
+        assertTrue(result.isEmpty());
+    }
+
+    /**
+     * getUserByUsername
+     */
+
+    @Test
+    void getUserByUsernameReturnsUser() {
+
+        when(userRepository.findByUsername("gagetest"))
+                .thenReturn(Optional.of(user));
+
+        User result = service.getUserByUsername("gagetest");
+
+        assertEquals(user, result);
+
+        verify(userRepository).findByUsername("gagetest");
+    }
+
+    @Test
+    void getUserByUsernameThrowsWhenMissing() {
+
+        when(userRepository.findByUsername("missing"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                UsernameNotFoundException.class,
+                () -> service.getUserByUsername("missing"));
+    }
+
+    /**
+     * updateUser
+     */
+
+    @Test
+    void updateUserUpdatesUsernameAndEmail() {
+
+        UpdateUserDto dto =
+                new UpdateUserDto("newuser", "new@test.com");
+
+        when(userRepository.findByUsername("gagetest"))
+                .thenReturn(Optional.of(user));
+
+        when(userRepository.existsByUsername("newuser"))
+                .thenReturn(false);
+
+        when(userRepository.save(user))
+                .thenReturn(user);
+
+        ResponseUserDto result =
+                service.updateUser("gagetest", dto);
+
+        assertEquals("newuser", result.username());
+        assertEquals("new@test.com", result.email());
+
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void updateUserReturnsNullWhenUsernameAlreadyExists() {
+
+        UpdateUserDto dto =
+                new UpdateUserDto("taken", "new@test.com");
+
+        when(userRepository.findByUsername("gagetest"))
+                .thenReturn(Optional.of(user));
+
+        when(userRepository.existsByUsername("taken"))
+                .thenReturn(true);
+
+        ResponseUserDto result =
+                service.updateUser("gagetest", dto);
+
+        assertNull(result);
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void updateUserAllowsKeepingSameUsername() {
+
+        UpdateUserDto dto =
+                new UpdateUserDto("gagetest", "updated@test.com");
+
+        when(userRepository.findByUsername("gagetest"))
+                .thenReturn(Optional.of(user));
+
+        when(userRepository.save(user))
+                .thenReturn(user);
+
+        ResponseUserDto result =
+                service.updateUser("gagetest", dto);
+
+        assertEquals("gagetest", result.username());
+        assertEquals("updated@test.com", result.email());
+
+        verify(userRepository, never()).existsByUsername(anyString());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void updateUserThrowsWhenCurrentUserMissing() {
+
+        UpdateUserDto dto =
+                new UpdateUserDto("newuser", "new@test.com");
+
+        when(userRepository.findByUsername("missing"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                UsernameNotFoundException.class,
+                () -> service.updateUser("missing", dto));
+
+        verify(userRepository, never()).save(any());
+    }
+}

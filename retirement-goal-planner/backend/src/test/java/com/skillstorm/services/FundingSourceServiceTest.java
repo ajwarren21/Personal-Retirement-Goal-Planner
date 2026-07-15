@@ -1,162 +1,267 @@
-// package com.skillstorm.services;
+package com.skillstorm.services;
 
-// import static org.junit.jupiter.api.Assertions.assertEquals;
-// import static org.junit.jupiter.api.Assertions.assertFalse;
-// import static org.junit.jupiter.api.Assertions.assertThrows;
-// import static org.mockito.ArgumentMatchers.any;
-// import static org.mockito.Mockito.doNothing;
-// import static org.mockito.Mockito.mock;
-// import static org.mockito.Mockito.never;
-// import static org.mockito.Mockito.times;
-// import static org.mockito.Mockito.verify;
-// import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-// import java.util.List;
-// import java.util.Optional;
+import java.util.List;
+import java.util.Optional;
 
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
-// import org.junit.jupiter.api.extension.ExtendWith;
-// import org.mockito.InjectMocks;
-// import org.mockito.Mock;
-// import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-// import com.skillstorm.dtos.FundingSourceDto;
-// import com.skillstorm.dtos.ResponseFundingSourceDto;
-// import com.skillstorm.exceptions.SourceNotFoundException;
-// import com.skillstorm.mappers.FundingSourceMapper;
-// import com.skillstorm.models.FundingSource;
-// import com.skillstorm.repositories.FundingSourceRepository;
+import com.skillstorm.dtos.FundingSourceDto;
+import com.skillstorm.dtos.ResponseFundingSourceDto;
+import com.skillstorm.exceptions.SourceNotFoundException;
+import com.skillstorm.mappers.FundingSourceMapper;
+import com.skillstorm.models.FundingSource;
+import com.skillstorm.models.User;
+import com.skillstorm.repositories.FundingSourceRepository;
+import com.skillstorm.repositories.UserRepository;
 
-// @ExtendWith(MockitoExtension.class)
-// public class FundingSourceServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class FundingSourceServiceTest {
 
-//     @Mock
-//     private FundingSourceRepository repo;
+    private static final String USERNAME = "testuser";
 
-//     @Mock
-//     private FundingSourceMapper mapper;
+    @Mock
+    private FundingSourceRepository repo;
 
-//     @InjectMocks
-//     private FundingSourceService service;
+    @Mock
+    private UserRepository userRepository;
 
-//     private FundingSource fundingSource;
-//     private FundingSourceDto fundingSourceDto;
-//     private ResponseFundingSourceDto responseFundingSourceDto;
+    @Mock
+    private FundingSourceMapper mapper;
 
-//     // Runs before each test - sets up the test data
-//     @BeforeEach
-//     void setUp() {
-//         fundingSource = new FundingSource();
-//         fundingSource.setId(1L);
+    @InjectMocks
+    private FundingSourceService service;
 
-//         fundingSourceDto = mock(FundingSourceDto.class);
-//         responseFundingSourceDto = mock(ResponseFundingSourceDto.class);
-//     }
+    private User user;
+    private FundingSource fundingSource;
+    private FundingSourceDto fundingSourceDto;
+    private ResponseFundingSourceDto responseFundingSourceDto;
 
+    @BeforeEach
+    void setUp() {
+        user = new User();
+        user.setId(1L);
+        user.setUsername(USERNAME);
 
-//     @Test
-//     void getAllFundingSourcesReturnsListOfDtos() {
+        fundingSource = new FundingSource();
+        fundingSource.setId(1L);
+        fundingSource.setUser(user);
 
-//         when(repo.findAll()).thenReturn(List.of(fundingSource));
+        fundingSourceDto = mock(FundingSourceDto.class);
+        responseFundingSourceDto = mock(ResponseFundingSourceDto.class);
+    }
 
-//         when(mapper.toDto(fundingSource)).thenReturn(responseFundingSourceDto);
+    private FundingSource fundingSourceOwnedByOther() {
+        User otherUser = new User();
+        otherUser.setId(2L);
 
-//         Iterable<ResponseFundingSourceDto> result = service.getAllFundingSources();
+        FundingSource other = new FundingSource();
+        other.setId(1L);
+        other.setUser(otherUser);
+        return other;
+    }
 
-//         assertEquals(List.of(responseFundingSourceDto), result);
+    /**
+     * Get sources by User valid
+     */
+    @Test
+    void getSourcesByUserReturnsListOfDtos() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findByUserId(user.getId())).thenReturn(List.of(fundingSource));
+        when(mapper.toDto(fundingSource)).thenReturn(responseFundingSourceDto);
 
-//         verify(repo, times(1)).findAll();
-//     }
+        Iterable<ResponseFundingSourceDto> result = service.getSourcesByUser(USERNAME);
 
-//     @Test
-//     void getAllFundingSourcesReturnsEmptyWhenNoneExist() {
+        assertEquals(List.of(responseFundingSourceDto), result);
+        verify(repo, times(1)).findByUserId(user.getId());
+    }
 
-//         when(repo.findAll()).thenReturn(List.of());
+    /**
+     * Get sources by user empyt
+     */
+    @Test
+    void getSourcesByUserReturnsEmptyWhenNoneExist() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findByUserId(user.getId())).thenReturn(List.of());
 
-//         Iterable<ResponseFundingSourceDto> result = service.getAllFundingSources();
+        Iterable<ResponseFundingSourceDto> result = service.getSourcesByUser(USERNAME);
 
-//         assertFalse(result.iterator().hasNext());
-//     }
+        assertFalse(result.iterator().hasNext());
+    }
 
+    /**
+     * Get sources by user invalid
+     */
+    @Test
+    void getSourcesByUserThrowsWhenUserNotFound() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.empty());
 
-//     @Test
-//     void getFundingSourceByIdReturnsDto() {
+        assertThrows(RuntimeException.class, () -> service.getSourcesByUser(USERNAME));
+    }
 
-//         when(repo.findById(1L)).thenReturn(Optional.of(fundingSource));
+    
+    /**
+     * Get source by Id valid
+     */
+    @Test
+    void getFundingSourceByIdForUserReturnsDto() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findById(1L)).thenReturn(Optional.of(fundingSource));
+        when(mapper.toDto(fundingSource)).thenReturn(responseFundingSourceDto);
 
-//         when(mapper.toDto(fundingSource)).thenReturn(responseFundingSourceDto);
+        ResponseFundingSourceDto result = service.getFundingSourceByIdForUser(1L, USERNAME);
 
-//         ResponseFundingSourceDto result = service.getFundingSourceById(1L);
+        assertEquals(responseFundingSourceDto, result);
+        verify(repo, times(1)).findById(1L);
+    }
 
-//         assertEquals(responseFundingSourceDto, result);
+    /**
+     * Get source by Id invalid
+     */
+    @Test
+    void getFundingSourceByIdForUserThrowsWhenNotFound() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findById(200L)).thenReturn(Optional.empty());
 
-//         verify(repo, times(1)).findById(1L);
-//     }
+        assertThrows(SourceNotFoundException.class, () -> service.getFundingSourceByIdForUser(200L, USERNAME));
+    }
 
-//     @Test
-//     void getFundingSourceByIdThrowsExceptionWhenNotFound() {
+    /**
+     * Get source by Id not owned by current user
+     */
+    @Test
+    void getFundingSourceByIdForUserThrowsWhenNotOwnedByUser() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findById(1L)).thenReturn(Optional.of(fundingSourceOwnedByOther()));
 
-//         when(repo.findById(200L)).thenReturn(Optional.empty());
+        assertThrows(SourceNotFoundException.class, () -> service.getFundingSourceByIdForUser(1L, USERNAME));
+    }
 
-//         assertThrows(SourceNotFoundException.class, () -> service.getFundingSourceById(200L));
-//     }
+    
+    /**
+     * Create new new source by user valid
+     */
+    @Test
+    void createSourceForUserReturnsDto() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(mapper.toEntity(fundingSourceDto)).thenReturn(fundingSource);
+        when(repo.save(fundingSource)).thenReturn(fundingSource);
+        when(mapper.toDto(fundingSource)).thenReturn(responseFundingSourceDto);
 
+        ResponseFundingSourceDto result = service.createSourceForUser(fundingSourceDto, USERNAME);
 
-//     @Test
-//     void createFundingSourceReturnsDto() {
+        assertEquals(responseFundingSourceDto, result);
+        verify(repo, times(1)).save(fundingSource);
+    }
 
-//         when(mapper.toEntity(fundingSourceDto)).thenReturn(fundingSource);
+    /**
+     * Create new source by user invalid
+     */
+    @Test
+    void createSourceForUserThrowsWhenUserNotFound() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.empty());
 
-//         when(repo.save(fundingSource)).thenReturn(fundingSource);
+        assertThrows(RuntimeException.class, () -> service.createSourceForUser(fundingSourceDto, USERNAME));
+        verify(repo, never()).save(any());
+    }
 
-//         when(mapper.toDto(fundingSource)).thenReturn(responseFundingSourceDto);
+    
+    /**
+     * update source by user valid
+     */
+    @Test
+    void updateFundingSourceForUserModifiesAndReturnsDto() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findById(1L)).thenReturn(Optional.of(fundingSource));
+        doNothing().when(mapper).updateEntityFromDto(fundingSourceDto, fundingSource);
+        when(repo.save(fundingSource)).thenReturn(fundingSource);
+        when(mapper.toDto(fundingSource)).thenReturn(responseFundingSourceDto);
 
-//         ResponseFundingSourceDto result = service.createFundingSource(fundingSourceDto);
+        ResponseFundingSourceDto result = service.updateFundingSourceForUser(1L, fundingSourceDto, USERNAME);
 
-//         assertEquals(responseFundingSourceDto, result);
+        assertEquals(responseFundingSourceDto, result);
+        verify(mapper, times(1)).updateEntityFromDto(fundingSourceDto, fundingSource);
+        verify(repo, times(1)).save(fundingSource);
+    }
 
-//         verify(repo, times(1)).save(fundingSource);
-//     }
+    /**
+     * Update source by user invalid
+     */
+    @Test
+    void updateFundingSourceForUserThrowsWhenNotFound() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findById(200L)).thenReturn(Optional.empty());
 
+        assertThrows(SourceNotFoundException.class,
+                () -> service.updateFundingSourceForUser(200L, fundingSourceDto, USERNAME));
+        verify(repo, never()).save(any());
+    }
 
-//     @Test
-//     void updateFundingSourceModifiesAndReturnsDto() {
+    /**
+     * update source by user not owned by current user
+     */
+    @Test
+    void updateFundingSourceForUserThrowsWhenNotOwnedByUser() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findById(1L)).thenReturn(Optional.of(fundingSourceOwnedByOther()));
 
-//         when(repo.findById(1L)).thenReturn(Optional.of(fundingSource));
+        assertThrows(SourceNotFoundException.class,
+                () -> service.updateFundingSourceForUser(1L, fundingSourceDto, USERNAME));
+        verify(repo, never()).save(any());
+    }
 
-//         doNothing().when(mapper).updateEntityFromDto(fundingSourceDto, fundingSource);
+    
+    /**
+     * Delete source by user valid
+     */
+    @Test
+    void deleteFundingSourceForUserDeletes() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findById(1L)).thenReturn(Optional.of(fundingSource));
+        doNothing().when(repo).deleteById(1L);
 
-//         when(repo.save(fundingSource)).thenReturn(fundingSource);
+        service.deleteFundingSourceForUser(1L, USERNAME);
 
-//         when(mapper.toDto(fundingSource)).thenReturn(responseFundingSourceDto);
+        verify(repo, times(1)).deleteById(1L);
+    }
 
-//         ResponseFundingSourceDto result = service.updateFundingSource(1L, fundingSourceDto);
+    /**
+     * delete source by user invalid
+     */
+    @Test
+    void deleteFundingSourceForUserThrowsWhenNotFound() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findById(200L)).thenReturn(Optional.empty());
 
-//         assertEquals(responseFundingSourceDto, result);
+        assertThrows(SourceNotFoundException.class, () -> service.deleteFundingSourceForUser(200L, USERNAME));
+        verify(repo, never()).deleteById(anyLong());
+    }
 
-//         verify(mapper, times(1)).updateEntityFromDto(fundingSourceDto, fundingSource);
-//         verify(repo, times(1)).save(fundingSource);
-//     }
+    /**
+     * delete source by user not owned by current user
+     */
+    @Test
+    void deleteFundingSourceForUserThrowsWhenNotOwnedByUser() {
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(repo.findById(1L)).thenReturn(Optional.of(fundingSourceOwnedByOther()));
 
-//     @Test
-//     void updateFundingSourceThrowsExceptionWhenNotFound() {
-
-//         when(repo.findById(200L)).thenReturn(Optional.empty());
-
-//         assertThrows(SourceNotFoundException.class, () -> service.updateFundingSource(200L, fundingSourceDto));
-
-//         verify(repo, never()).save(any());
-//     }
-
-
-//     @Test
-//     void deleteFundingSourceDeletes() {
-
-//         doNothing().when(repo).deleteById(1L);
-
-//         service.deleteFundingSource(1L);
-
-//         verify(repo, times(1)).deleteById(1L);
-//     }
-// }
+        assertThrows(SourceNotFoundException.class, () -> service.deleteFundingSourceForUser(1L, USERNAME));
+        verify(repo, never()).deleteById(anyLong());
+    }
+}
